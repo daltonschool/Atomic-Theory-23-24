@@ -43,10 +43,11 @@ public class MecanumTeleOp extends OpMode {
         telemetry.addData("Status", "Looping");
         //rb.run(gamepad1);
         driveChassis();
+        //slowdriveChassis();
 //        moveDuck();
-//        lift();
+        lift();
         intake();
-        servo();
+        //servo();
 
         telemetry.update();
     }
@@ -65,18 +66,17 @@ public class MecanumTeleOp extends OpMode {
 //        }
 //    }
 
-    //Intake
-//    private void lift() {
-//        if(gamepad2.b){
-//            rb.intakemotor.setPower(1);
-//        }
-//        if(gamepad2.x){
-//            rb.intakemotor.setPower(-1);
-//        }
-//        else {
-//            rb.intakemotor.setPower(0);
-//        }
-//    }
+    private void lift() {
+        if(gamepad1.b){
+            rb.liftmotor.setPower(1);
+        }
+        else if(gamepad1.x){
+            rb.liftmotor.setPower(-1);
+        }
+        else {
+            rb.liftmotor.setPower(0);
+        }
+    }
 
 
     //moves the lift up
@@ -104,6 +104,25 @@ public class MecanumTeleOp extends OpMode {
         double x = gamepad1.left_stick_x;
         double rx = gamepad1.right_stick_x * 0.85;
 
+
+        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+        double frontLeftPower = (y + x + rx) / denominator;
+        double backLeftPower = (y - x + rx) / denominator;
+        double frontRightPower = (y - x - rx) / denominator;
+        double backRightPower = (y + x - rx) / denominator;
+
+        rb.flMotor.setPower(frontLeftPower);
+        rb.blMotor.setPower(backLeftPower);
+        rb.frMotor.setPower(frontRightPower);
+        rb.brMotor.setPower(backRightPower);
+    }
+
+    private void slowdriveChassis() {
+        double scale = gamepad1.right_trigger > 0 ? 0.25 : 1;
+
+        double y = -gamepad1.left_stick_y * 0.3 * scale;
+        double x = gamepad1.left_stick_x * 0.3 * scale;
+        double rx = gamepad1.right_stick_x * 0.35 * scale;
 
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
         double frontLeftPower = (y + x + rx) / denominator;
