@@ -18,7 +18,7 @@ public class MecanumRobot {
     public static final double THETA_TOLERANCE = 0.04;
     public static double XY_TOLERANCE = 0.05;
     DcMotor flMotor, frMotor, blMotor, brMotor, intakemotor, liftmotor;
-    Servo launchservo = null, capServo = null;
+    Servo launchservo = null, boxServo = null;
     static final double     COUNTS_PER_MOTOR_REV    = 537.6 ;    // eg: TETRIX Motor Encoder
     static final double     DRIVE_GEAR_REDUCTION    = 1 ;     // This is < 1.0 if geared UP
     static final double     WHEEL_DIAMETER_INCHES   = 3.937 ;     // For figuring circumference
@@ -49,7 +49,7 @@ public class MecanumRobot {
         intakemotor = hardwareMap.get(DcMotor.class, "intake");
         liftmotor = hardwareMap.get(DcMotor.class, "lift");
         //launchservo = hardwareMap.get(Servo.class, "launcher");
-//        capServo = hardwareMap.get(Servo.class, "capServo");
+        boxServo = hardwareMap.get(Servo.class, "boxServo");
 
 
         // Set motor directions

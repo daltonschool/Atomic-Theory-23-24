@@ -37,10 +37,10 @@ public class FieldCentricDrive extends LinearOpMode {
         backRightMotor = hardwareMap.dcMotor.get("br");
 
 
-        frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
-        frontRightMotor.setDirection(DcMotor.Direction.FORWARD);
-        backLeftMotor.setDirection(DcMotor.Direction.REVERSE);
-        backRightMotor.setDirection(DcMotor.Direction.FORWARD);
+        frontLeftMotor.setDirection(DcMotor.Direction.FORWARD);
+        frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
+        backLeftMotor.setDirection(DcMotor.Direction.FORWARD);
+        backRightMotor.setDirection(DcMotor.Direction.REVERSE);
         //liftmotor.setDirection(DcMotor.Direction.FORWARD);
 
         // Set all motors to brake when power is zero

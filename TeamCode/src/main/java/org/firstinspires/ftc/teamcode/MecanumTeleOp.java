@@ -47,7 +47,8 @@ public class MecanumTeleOp extends OpMode {
 //        moveDuck();
         lift();
         intake();
-        //servo();
+        //launchservo();
+        boxservo();
 
         telemetry.update();
     }
@@ -68,10 +69,10 @@ public class MecanumTeleOp extends OpMode {
 
     private void lift() {
         if(gamepad1.b){
-            rb.liftmotor.setPower(1);
+            rb.liftmotor.setPower(0.1);
         }
         else if(gamepad1.x){
-            rb.liftmotor.setPower(-1);
+            rb.liftmotor.setPower(-0.1);
         }
         else {
             rb.liftmotor.setPower(0);
@@ -92,11 +93,22 @@ public class MecanumTeleOp extends OpMode {
         }
     }
 
-    private void servo() {
+    private void launchservo() {
         if(gamepad1.y){
             rb.launchservo.setPosition(0.5);
         }
     }
+
+    private void boxservo() {
+        if(gamepad1.y){
+            rb.boxServo.setPosition(0.5);
+        }
+        else if(gamepad1.a){
+            rb.boxServo.setPosition(0.05);
+        }
+    }
+
+
 
 
     private void driveChassis() {
