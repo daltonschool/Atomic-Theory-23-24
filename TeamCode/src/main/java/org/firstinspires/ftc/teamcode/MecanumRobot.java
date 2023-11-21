@@ -48,15 +48,15 @@ public class MecanumRobot {
         brMotor = hardwareMap.get(DcMotor.class, "br");
         intakemotor = hardwareMap.get(DcMotor.class, "intake");
         liftmotor = hardwareMap.get(DcMotor.class, "lift");
-        //launchservo = hardwareMap.get(Servo.class, "launcher");
+        launchservo = hardwareMap.get(Servo.class, "launcher");
         boxServo = hardwareMap.get(Servo.class, "boxServo");
 
 
         // Set motor directions
-        flMotor.setDirection(DcMotor.Direction.FORWARD);
-        frMotor.setDirection(DcMotor.Direction.REVERSE);
-        blMotor.setDirection(DcMotor.Direction.FORWARD);
-        brMotor.setDirection(DcMotor.Direction.REVERSE);
+        flMotor.setDirection(DcMotor.Direction.REVERSE);
+        frMotor.setDirection(DcMotor.Direction.FORWARD);
+        blMotor.setDirection(DcMotor.Direction.REVERSE);
+        brMotor.setDirection(DcMotor.Direction.FORWARD);
         intakemotor.setDirection(DcMotor.Direction.REVERSE);
         liftmotor.setDirection(DcMotor.Direction.FORWARD);
 
@@ -67,6 +67,9 @@ public class MecanumRobot {
         brMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intakemotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         liftmotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        liftmotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        liftmotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         //liftmotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
@@ -273,6 +276,125 @@ public class MecanumRobot {
             driveStop();
         }
     }
+
+
+    void strafeByEncoder(double inches, DcMotor[] motors, double power) {
+        power = Math.abs(power);
+        double positionChange = COUNTS_PER_INCH * inches;
+
+        // Assuming motors[0] & motors[1] are left side motors and motors[2] & motors[3] are right side motors
+        double[] targetPositions = new double[motors.length];
+
+        for (int i = 0; i < motors.length; i++) {
+            int currentPosition = motors[i].getCurrentPosition();
+            // Reverse the direction for right-side motors when strafing left (negative inches) EDIT THIS: either i<2 or i >= 2 or i%2 == 0
+            targetPositions[i] = (i < 2) ? currentPosition + positionChange : currentPosition - positionChange;
+        }
+
+        if (inches > 0) {
+            strafeRight(power);
+        } else {
+            strafeRight(-power);
+        }
+
+        while (opMode.opModeIsActive()) {
+            boolean allReached = true;
+            for (int i = 0; i < motors.length; i++) {
+                if ((i < 2 && motors[i].getCurrentPosition() < targetPositions[i]) ||
+                        (i >= 2 && motors[i].getCurrentPosition() > targetPositions[i])) {
+                    allReached = false;
+                    break;
+                }
+            }
+            if (allReached) {
+                break;
+            }
+            Thread.yield();
+        }
+
+        driveStop();
+    }
+
+
+    void turnByFourEncoders(double inches, DcMotor[] motors, double power) {
+        power = Math.abs(power);
+        double positionChange = COUNTS_PER_INCH * inches;
+
+        // Assuming motors[0] & motors[2] are one diagonal pair and motors[1] & motors[3] are the other diagonal pair
+        double[] targetPositions = new double[motors.length];
+
+        for (int i = 0; i < motors.length; i++) {
+            int currentPosition = motors[i].getCurrentPosition();
+            // Reverse the direction for one diagonal pair when turning counterclockwise (negative inches) EDIT THIS: either i<2 or i >= 2 or i%2 == 0
+            targetPositions[i] = ((i % 2) == 0) ? currentPosition + positionChange : currentPosition - positionChange;
+        }
+
+        if (inches > 0) {
+            turnClockwise(power);
+        } else {
+            turnClockwise(-power);
+        }
+
+        while (opMode.opModeIsActive()) {
+            boolean allReached = true;
+            for (int i = 0; i < motors.length; i++) {
+                if (((i % 2) == 0 && motors[i].getCurrentPosition() < targetPositions[i]) ||
+                        ((i % 2) != 0 && motors[i].getCurrentPosition() > targetPositions[i])) {
+                    allReached = false;
+                    break;
+                }
+            }
+            if (allReached) {
+                break;
+            }
+            Thread.yield();
+        }
+
+        driveStop();
+    }
+
+
+    void driveByEncoder(double inches, DcMotor[] motors, double power) {
+        power = Math.abs(power);
+        double positionChange = COUNTS_PER_INCH * inches;
+
+        // Assuming motors[0] & motors[1] are front motors, and motors[2] & motors[3] are back motors
+        double[] targetPositions = new double[motors.length];
+
+        for (int i = 0; i < motors.length; i++) {
+            int currentPosition = motors[i].getCurrentPosition();
+            // Calculate target positions based on direction
+            targetPositions[i] = currentPosition + positionChange;
+        }
+
+        if (inches > 0) {
+            driveForward(power);
+        } else {
+            driveForward(-power);
+        }
+
+        while (opMode.opModeIsActive()) {
+            boolean allReached = true;
+            for (int i = 0; i < motors.length; i++) {
+                if ((inches > 0 && motors[i].getCurrentPosition() < targetPositions[i]) ||
+                        (inches < 0 && motors[i].getCurrentPosition() > targetPositions[i])) {
+                    allReached = false;
+                    break;
+                }
+            }
+            if (allReached) {
+                break;
+            }
+            Thread.yield();
+        }
+
+        driveStop();
+    }
+
+
+
+
+
 
 
 }

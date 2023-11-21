@@ -46,8 +46,8 @@ public class MecanumTeleOp extends OpMode {
         //slowdriveChassis();
 //        moveDuck();
         lift();
-        intake();
-        //launchservo();
+        intake2();
+        launchservo();
         boxservo();
 
         telemetry.update();
@@ -68,25 +68,46 @@ public class MecanumTeleOp extends OpMode {
 //    }
 
     private void lift() {
-        if(gamepad1.b){
-            rb.liftmotor.setPower(0.1);
+        if(gamepad2.b){
+            rb.liftmotor.setPower(0.75);
         }
-        else if(gamepad1.x){
-            rb.liftmotor.setPower(-0.1);
+        else if (rb.liftmotor.getCurrentPosition() > 0){
+            if(gamepad2.x){
+                rb.liftmotor.setPower(-0.4);
+            }
+            else{
+                rb.liftmotor.setPower(0);
+            }
         }
         else {
             rb.liftmotor.setPower(0);
         }
+        telemetry.addData("Starting at",
+                rb.liftmotor.getCurrentPosition());
     }
 
 
     //moves the lift up
     private void intake() {
-        if(gamepad1.right_bumper){
-            rb.intakemotor.setPower(1);
+        if(gamepad2.right_bumper){
+            rb.intakemotor.setPower(0.5);
         }
-        else if(gamepad1.left_bumper){
-            rb.intakemotor.setPower(-1);
+        else if(gamepad2.left_bumper){
+            rb.intakemotor.setPower(-0.25);
+        }
+        else {
+            rb.intakemotor.setPower(0);
+        }
+    }
+
+    private void intake2() {
+
+        if(gamepad2.right_trigger > 0.5 || gamepad2.left_trigger > 0.5){
+            rb.intakemotor.setPower((gamepad2.right_trigger + gamepad2.left_trigger)/2);
+        }
+
+        else if(gamepad2.left_bumper || gamepad2.right_bumper){
+            rb.intakemotor.setPower(-0.25);
         }
         else {
             rb.intakemotor.setPower(0);
@@ -95,17 +116,26 @@ public class MecanumTeleOp extends OpMode {
 
     private void launchservo() {
         if(gamepad1.y){
-            rb.launchservo.setPosition(0.5);
+            telemetry.addData("Pressed", gamepad2.y);
+            rb.launchservo.setPosition(0.7);
+        }
+        if(gamepad1.a){
+            telemetry.addData("Pressed", gamepad2.y);
+            rb.launchservo.setPosition(0.0);
         }
     }
 
     private void boxservo() {
-        if(gamepad1.y){
-            rb.boxServo.setPosition(0.5);
+        if(gamepad2.dpad_up){
+            rb.boxServo.setPosition(0);
         }
-        else if(gamepad1.a){
-            rb.boxServo.setPosition(0.05);
+        else if(gamepad2.dpad_right){
+            rb.boxServo.setPosition(0.6);
         }
+        else if(gamepad2.dpad_down){
+            rb.boxServo.setPosition(1);
+        }
+
     }
 
 
@@ -123,29 +153,18 @@ public class MecanumTeleOp extends OpMode {
         double frontRightPower = (y - x - rx) / denominator;
         double backRightPower = (y + x - rx) / denominator;
 
-        rb.flMotor.setPower(frontLeftPower);
-        rb.blMotor.setPower(backLeftPower);
-        rb.frMotor.setPower(frontRightPower);
-        rb.brMotor.setPower(backRightPower);
-    }
-
-    private void slowdriveChassis() {
-        double scale = gamepad1.right_trigger > 0 ? 0.25 : 1;
-
-        double y = -gamepad1.left_stick_y * 0.3 * scale;
-        double x = gamepad1.left_stick_x * 0.3 * scale;
-        double rx = gamepad1.right_stick_x * 0.35 * scale;
-
-        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
-        double frontLeftPower = (y + x + rx) / denominator;
-        double backLeftPower = (y - x + rx) / denominator;
-        double frontRightPower = (y - x - rx) / denominator;
-        double backRightPower = (y + x - rx) / denominator;
-
-        rb.flMotor.setPower(frontLeftPower);
-        rb.blMotor.setPower(backLeftPower);
-        rb.frMotor.setPower(frontRightPower);
-        rb.brMotor.setPower(backRightPower);
+        if(gamepad1.right_trigger > 0.5) {
+            rb.flMotor.setPower(frontLeftPower * 0.25);
+            rb.blMotor.setPower(backLeftPower * 0.25);
+            rb.frMotor.setPower(frontRightPower * 0.25);
+            rb.brMotor.setPower(backRightPower * 0.25);
+        }
+        else {
+            rb.flMotor.setPower(frontLeftPower);
+            rb.blMotor.setPower(backLeftPower);
+            rb.frMotor.setPower(frontRightPower);
+            rb.brMotor.setPower(backRightPower);
+        }
     }
 }
 
