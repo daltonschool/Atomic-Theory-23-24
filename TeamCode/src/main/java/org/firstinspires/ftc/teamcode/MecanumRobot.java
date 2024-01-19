@@ -18,7 +18,7 @@ public class MecanumRobot {
     public static final double THETA_TOLERANCE = 0.04;
     public static double XY_TOLERANCE = 0.05;
     DcMotor flMotor, frMotor, blMotor, brMotor, intakemotor, liftmotor;
-    Servo launchservo = null, boxServo = null;
+    Servo launchservo = null, boxServo = null, armServo1 = null, armServo2 = null;
     static final double     COUNTS_PER_MOTOR_REV    = 537.6 ;    // eg: TETRIX Motor Encoder
     static final double     DRIVE_GEAR_REDUCTION    = 1 ;     // This is < 1.0 if geared UP
     static final double     WHEEL_DIAMETER_INCHES   = 3.937 ;     // For figuring circumference
@@ -49,7 +49,9 @@ public class MecanumRobot {
         intakemotor = hardwareMap.get(DcMotor.class, "intake");
         liftmotor = hardwareMap.get(DcMotor.class, "lift");
         launchservo = hardwareMap.get(Servo.class, "launcher");
-        boxServo = hardwareMap.get(Servo.class, "boxServo");
+        boxServo = hardwareMap.get(Servo.class, "boxservo");
+        armServo1 = hardwareMap.get(Servo.class, "armservo1");
+        armServo2 = hardwareMap.get(Servo.class, "armservo2");
 
 
         // Set motor directions
@@ -57,8 +59,10 @@ public class MecanumRobot {
         frMotor.setDirection(DcMotor.Direction.FORWARD);
         blMotor.setDirection(DcMotor.Direction.REVERSE);
         brMotor.setDirection(DcMotor.Direction.FORWARD);
-        intakemotor.setDirection(DcMotor.Direction.REVERSE);
+        intakemotor.setDirection(DcMotor.Direction.FORWARD);
         liftmotor.setDirection(DcMotor.Direction.FORWARD);
+        armServo1.setDirection(Servo.Direction.REVERSE);
+        armServo2.setDirection(Servo.Direction.FORWARD);
 
         // Set all motors to brake when power is zero
         flMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

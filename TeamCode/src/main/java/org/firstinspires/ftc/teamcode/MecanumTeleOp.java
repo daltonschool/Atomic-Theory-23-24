@@ -45,7 +45,7 @@ public class MecanumTeleOp extends OpMode {
         driveChassis();
         //slowdriveChassis();
 //        moveDuck();
-        lift();
+        liftNoEncoder();
         intake2();
         launchservo();
         boxservo();
@@ -69,11 +69,11 @@ public class MecanumTeleOp extends OpMode {
 
     private void lift() {
         if(gamepad2.b){
-            rb.liftmotor.setPower(0.75);
+            rb.liftmotor.setPower(1);
         }
         else if (rb.liftmotor.getCurrentPosition() > 0){
             if(gamepad2.x){
-                rb.liftmotor.setPower(-0.4);
+                rb.liftmotor.setPower(-0.5);
             }
             else{
                 rb.liftmotor.setPower(0);
@@ -84,6 +84,18 @@ public class MecanumTeleOp extends OpMode {
         }
         telemetry.addData("Starting at",
                 rb.liftmotor.getCurrentPosition());
+    }
+
+    private void liftNoEncoder() {
+        if(gamepad2.b){
+            rb.liftmotor.setPower(1);
+        }
+        else if(gamepad2.x){
+            rb.liftmotor.setPower(-0.7);
+        }
+        else {
+            rb.liftmotor.setPower(0);
+        }
     }
 
 
@@ -126,16 +138,23 @@ public class MecanumTeleOp extends OpMode {
     }
 
     private void boxservo() {
-        if(gamepad2.dpad_up){
+        // arm servo
+        if(gamepad2.y){
             rb.boxServo.setPosition(0);
         }
-        else if(gamepad2.dpad_right){
-            rb.boxServo.setPosition(0.6);
-        }
-        else if(gamepad2.dpad_down){
+        else if(gamepad2.a){
             rb.boxServo.setPosition(1);
         }
 
+        //box servo
+        else if(gamepad2.dpad_down){
+            rb.armServo1.setPosition(0.4);
+            rb.armServo2.setPosition(0.4);
+        }
+        else if(gamepad2.dpad_up){
+            rb.armServo1.setPosition(0.9);
+            rb.armServo2.setPosition(0.9);
+        }
     }
 
 
