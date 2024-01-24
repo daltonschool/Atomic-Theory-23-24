@@ -139,12 +139,12 @@ public class MecanumTeleOp extends OpMode {
     }
 
     private void launchservo() {
-        if(gamepad1.y){
-            telemetry.addData("Pressed", gamepad2.y);
+        if(gamepad1.y) {
+            telemetry.addData("Pressed", gamepad1.y);
             rb.launchservo.setPosition(1);
         }
-        if(gamepad1.a){
-            telemetry.addData("Pressed", gamepad2.y);
+        else if(gamepad1.a){
+            telemetry.addData("Pressed", gamepad1.y);
             rb.launchservo.setPosition(0.0);
         }
     }
