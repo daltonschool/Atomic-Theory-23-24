@@ -129,7 +129,7 @@ public class MecanumTeleOp extends OpMode {
     private void launchservo() {
         if(gamepad1.y){
             telemetry.addData("Pressed", gamepad2.y);
-            rb.launchservo.setPosition(0.7);
+            rb.launchservo.setPosition(1);
         }
         if(gamepad1.a){
             telemetry.addData("Pressed", gamepad2.y);
@@ -140,10 +140,10 @@ public class MecanumTeleOp extends OpMode {
     private void boxservo() {
         // arm servo
         if(gamepad2.y){
-            rb.boxServo.setPosition(0);
+            rb.boxServo.setPosition(0.2);
         }
         else if(gamepad2.a){
-            rb.boxServo.setPosition(1);
+            rb.boxServo.setPosition(0.8);
         }
 
         //box servo
@@ -152,8 +152,8 @@ public class MecanumTeleOp extends OpMode {
             rb.armServo2.setPosition(0.4);
         }
         else if(gamepad2.dpad_up){
-            rb.armServo1.setPosition(0.9);
-            rb.armServo2.setPosition(0.9);
+            rb.armServo1.setPosition(0.75);
+            rb.armServo2.setPosition(0.75);
         }
     }
 
