@@ -17,6 +17,10 @@ public class MecanumTeleOp extends OpMode {
 
     double liftmotorStartingPosition;
     double servoBoxStartingPosition = 0;
+    boolean YisPressed;
+    boolean boxOpen;
+    boolean BisPressed;
+    boolean boxRaised;
 
 
     @Override
@@ -27,6 +31,13 @@ public class MecanumTeleOp extends OpMode {
 
         //liftmotorStartingPosition = rb.liftmotor.getCurrentPosition();
 //        servoBoxStartingPosition = rb.boxServo.getPosition();
+        rb.armServo1.setPosition(0.4);
+        rb.armServo2.setPosition(0.4);
+        rb.boxServo.setPosition(0.2);
+        YisPressed = false;
+        boxOpen = true;
+        BisPressed = false;
+        boxRaised = false;
 
         telemetry.addData("Status", "Initialized");
     }
@@ -49,6 +60,7 @@ public class MecanumTeleOp extends OpMode {
         intake2();
         launchservo();
         boxservo();
+        boxarms();
 
         telemetry.update();
     }
@@ -139,21 +151,42 @@ public class MecanumTeleOp extends OpMode {
 
     private void boxservo() {
         // arm servo
-        if(gamepad2.y){
-            rb.boxServo.setPosition(0.2);
+        if (!YisPressed) {
+            if (gamepad2.y) {
+                YisPressed = true;
+                if (boxOpen) {
+                    rb.boxServo.setPosition(0.8);
+                    boxOpen = false;
+                } else {
+                    rb.boxServo.setPosition(0.2);
+                    boxOpen = true;
+                }
+            }
+        } else{
+            if (!gamepad2.y) {
+                YisPressed = false;
+            }
         }
-        else if(gamepad2.a){
-            rb.boxServo.setPosition(0.8);
-        }
-
-        //box servo
-        else if(gamepad2.dpad_down){
-            rb.armServo1.setPosition(0.4);
-            rb.armServo2.setPosition(0.4);
-        }
-        else if(gamepad2.dpad_up){
-            rb.armServo1.setPosition(0.75);
-            rb.armServo2.setPosition(0.75);
+    }
+    private void boxarms() {
+        //box arms
+        if (!BisPressed) {
+            if (gamepad2.b) {
+                BisPressed = true;
+                if (boxRaised) {
+                    rb.armServo1.setPosition(0.4);
+                    rb.armServo2.setPosition(0.4);
+                    boxRaised = false;
+                } else {
+                    rb.armServo1.setPosition(0.8);
+                    rb.armServo2.setPosition(0.8);
+                    boxRaised = true;
+                }
+            }
+        } else{
+            if (!gamepad2.b) {
+                BisPressed = false;
+            }
         }
     }
 
