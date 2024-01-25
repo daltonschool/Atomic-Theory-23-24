@@ -14,7 +14,7 @@ import org.openftc.easyopencv.OpenCvWebcam;
 import java.util.LinkedList;
 
 
-@Autonomous(name = "rednoducktank")
+@Autonomous(name = "RedCloseAuto")
 public class RedCloseAuto extends LinearOpMode {
 
     /**
@@ -97,7 +97,7 @@ public class RedCloseAuto extends LinearOpMode {
         } else {
             level = 3; //right
         }
-        telemetry.addData("Shipping Hub Level", level);
+        telemetry.addData("Shipping Hub Location", level);
         telemetry.update();
 //
 
@@ -110,51 +110,51 @@ public class RedCloseAuto extends LinearOpMode {
 
         // Deposit the box on the correct level
 
-//       encoder auto
-        rb.driveForwardByEncoder(-30, rb.blMotor, 1);
-        Thread.sleep(500);
-        rb.turnClockwiseByEncoder(-8, rb.blMotor, 1);
-        Thread.sleep(500);
-
-        if(level == 1) { //left
-            rb.liftmotor.setTargetPosition(3000);
-            rb.liftmotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            rb.liftmotor.setPower(0.75);
-            Thread.sleep(2000);
-        } else if (level == 2) { //middle
-            rb.strafeRightByEncoder(10, rb.blMotor, 1);
-            rb.liftmotor.setTargetPosition(3000);
-            rb.liftmotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            rb.liftmotor.setPower(0.75);
-            Thread.sleep(2000);
-        } else { // right
-            rb.strafeRightByEncoder(20, rb.blMotor, 1);
-            rb.liftmotor.setTargetPosition(3000);
-            rb.liftmotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            rb.liftmotor.setPower(0.75);
-            Thread.sleep(2000);
-        }
-
-
-
-
-
-        rb.boxServo.setPosition(0);
-        Thread.sleep(2000);
-        rb.boxServo.setPosition(0.6);
-        Thread.sleep(5000);
-
-        rb.liftmotor.setTargetPosition(1500);
-        rb.liftmotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rb.liftmotor.setPower(0.75);
-
-
-        Thread.sleep(2000);
-
-
-        rb.turnClockwiseByEncoder(-10, rb.blMotor, 0.5);
-        Thread.sleep(100);
-        rb.driveForwardByEncoder(50, rb.blMotor, 1);
+//       encoder auto CHANGE HERE
+//        rb.driveForwardByEncoder(-30, rb.blMotor, 1);
+//        Thread.sleep(500);
+//        rb.turnClockwiseByEncoder(-8, rb.blMotor, 1);
+//        Thread.sleep(500);
+//
+//        if(level == 1) { //left
+//            rb.liftmotor.setTargetPosition(3000);
+//            rb.liftmotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            rb.liftmotor.setPower(0.75);
+//            Thread.sleep(2000);
+//        } else if (level == 2) { //middle
+//            rb.strafeRightByEncoder(10, rb.blMotor, 1);
+//            rb.liftmotor.setTargetPosition(3000);
+//            rb.liftmotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            rb.liftmotor.setPower(0.75);
+//            Thread.sleep(2000);
+//        } else { // right
+//            rb.strafeRightByEncoder(20, rb.blMotor, 1);
+//            rb.liftmotor.setTargetPosition(3000);
+//            rb.liftmotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            rb.liftmotor.setPower(0.75);
+//            Thread.sleep(2000);
+//        }
+//
+//
+//
+//
+//
+//        rb.boxServo.setPosition(0);
+//        Thread.sleep(2000);
+//        rb.boxServo.setPosition(0.6);
+//        Thread.sleep(5000);
+//
+//        rb.liftmotor.setTargetPosition(1500);
+//        rb.liftmotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        rb.liftmotor.setPower(0.75);
+//
+//
+//        Thread.sleep(2000);
+//
+//
+//        rb.turnClockwiseByEncoder(-10, rb.blMotor, 0.5);
+//        Thread.sleep(100);
+        //rb.driveForwardByEncoder(10, rb.blMotor, 1);
 
 
 //

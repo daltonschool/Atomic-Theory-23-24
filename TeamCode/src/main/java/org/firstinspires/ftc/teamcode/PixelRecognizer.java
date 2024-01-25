@@ -38,8 +38,8 @@ public class PixelRecognizer extends OpenCvPipeline {
     @Override
     public Mat processFrame(Mat input) {
         Mat mat = new Mat();
-        Scalar lowHSV = new Scalar(0, 100, 100); // red lower in hsv  Scalar(110, 100, 100); // blue lower in hsv
-        Scalar highHSV = new Scalar(10, 255, 255); // red upper in hsv Scalar(130, 255, 255); // blue upper in hsv
+        Scalar lowHSV = new Scalar(110, 100, 35); // purple lower in hsv
+        Scalar highHSV = new Scalar(150, 255, 255); // purple upper in hsv
         Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV); // convert to hsv
         Core.inRange(input, lowHSV, highHSV, mat); // make purple white, everything else black
         Mat left = mat.submat(LEFTBOX);

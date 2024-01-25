@@ -99,9 +99,13 @@ public class MecanumTeleOp extends OpMode {
     }
 
     private void liftNoEncoder() {
-        if (Math.abs(gamepad1.left_stick_y) > 0.2) {
-            rb.liftmotor.setPower(0.7 * gamepad1.left_stick_y);
+        if (Math.abs(gamepad2.left_stick_y) > 0.4) {
+            rb.liftmotor.setPower(0.75 * gamepad2.left_stick_y);
         }
+        else {
+            rb.liftmotor.setPower(0);
+        }
+
     }
 
 
