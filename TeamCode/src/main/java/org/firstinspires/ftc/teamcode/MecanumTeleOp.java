@@ -61,6 +61,7 @@ public class MecanumTeleOp extends OpMode {
         launchservo();
         boxservo();
         boxarms();
+        pullup();
 
         telemetry.update();
     }
@@ -99,7 +100,7 @@ public class MecanumTeleOp extends OpMode {
     }
 
     private void liftNoEncoder() {
-        if (Math.abs(gamepad2.left_stick_y) > 0.4) {
+        if (Math.abs(gamepad2.left_stick_y) > 0.5) {
             rb.liftmotor.setPower(0.75 * gamepad2.left_stick_y);
         }
         else {
@@ -184,6 +185,19 @@ public class MecanumTeleOp extends OpMode {
         } else{
             if (!gamepad2.b) {
                 BisPressed = false;
+            }
+        }
+    }
+
+    private void pullup() {
+        if (gamepad2.dpad_up) {
+            if (Math.abs(gamepad2.right_stick_y) > 0.5) {
+                rb.pMotor1.setPower(gamepad2.right_stick_y);
+                rb.pMotor2.setPower(gamepad2.right_stick_y);
+            }
+            else {
+                rb.pMotor1.setPower(0);
+                rb.pMotor2.setPower(0);
             }
         }
     }

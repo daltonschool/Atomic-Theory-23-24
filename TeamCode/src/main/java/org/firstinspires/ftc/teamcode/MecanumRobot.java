@@ -17,7 +17,7 @@ public class MecanumRobot {
 
     public static final double THETA_TOLERANCE = 0.04;
     public static double XY_TOLERANCE = 0.05;
-    DcMotor flMotor, frMotor, blMotor, brMotor, intakemotor, liftmotor;
+    DcMotor flMotor, frMotor, blMotor, brMotor, intakemotor, liftmotor, pMotor1, pMotor2;
     Servo launchservo = null, boxServo = null, armServo1 = null, armServo2 = null;
     static final double     COUNTS_PER_MOTOR_REV    = 537.6 ;    // eg: TETRIX Motor Encoder
     static final double     DRIVE_GEAR_REDUCTION    = 1 ;     // This is < 1.0 if geared UP
@@ -46,6 +46,8 @@ public class MecanumRobot {
         frMotor = hardwareMap.get(DcMotor.class, "fr");
         blMotor = hardwareMap.get(DcMotor.class, "bl");
         brMotor = hardwareMap.get(DcMotor.class, "br");
+        pMotor1 = hardwareMap.get(DcMotor.class, "pMotor1");
+        pMotor2 = hardwareMap.get(DcMotor.class, "pMotor2");
         intakemotor = hardwareMap.get(DcMotor.class, "intake");
         liftmotor = hardwareMap.get(DcMotor.class, "lift");
         launchservo = hardwareMap.get(Servo.class, "launcher");
@@ -59,6 +61,8 @@ public class MecanumRobot {
         frMotor.setDirection(DcMotor.Direction.FORWARD);
         blMotor.setDirection(DcMotor.Direction.REVERSE);
         brMotor.setDirection(DcMotor.Direction.FORWARD);
+        pMotor1.setDirection(DcMotor.Direction.REVERSE);
+        pMotor2.setDirection(DcMotor.Direction.FORWARD);
         intakemotor.setDirection(DcMotor.Direction.FORWARD);
         liftmotor.setDirection(DcMotor.Direction.FORWARD);
         armServo1.setDirection(Servo.Direction.REVERSE);
@@ -71,6 +75,8 @@ public class MecanumRobot {
         brMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intakemotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         liftmotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        pMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        pMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         liftmotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         liftmotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
