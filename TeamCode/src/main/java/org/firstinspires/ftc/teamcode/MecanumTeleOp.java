@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -140,11 +138,11 @@ public class MecanumTeleOp extends OpMode {
     private void launchservo() {
         if(gamepad1.y) {
             telemetry.addData("Pressed", gamepad1.y);
-            rb.launchservo.setPosition(1);
+            rb.launcher.setPosition(1);
         }
         else if(gamepad1.a){
             telemetry.addData("Pressed", gamepad1.y);
-            rb.launchservo.setPosition(0.0);
+            rb.launcher.setPosition(0.0);
         }
     }
 
