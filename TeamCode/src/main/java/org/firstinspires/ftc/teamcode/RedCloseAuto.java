@@ -46,6 +46,9 @@ public class RedCloseAuto extends LinearOpMode {
         rb.liftmotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rb.liftmotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        rb.frMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rb.frMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         telemetry.addData("Status", "Initialized");
 
         telemetry.update();
@@ -111,10 +114,10 @@ public class RedCloseAuto extends LinearOpMode {
         // Deposit the box on the correct level
 
 //       encoder auto CHANGE HERE
-//        rb.driveForwardByEncoder(-30, rb.blMotor, 1);
-//        Thread.sleep(500);
-//        rb.turnClockwiseByEncoder(-8, rb.blMotor, 1);
-//        Thread.sleep(500);
+        rb.driveForwardByEncoder(-30, rb.frMotor, 0.5);
+        Thread.sleep(500);
+        rb.turnClockwiseByEncoder(-8, rb.frMotor, 0.5);
+        Thread.sleep(500);
 //
 //        if(level == 1) { //left
 //            rb.liftmotor.setTargetPosition(3000);

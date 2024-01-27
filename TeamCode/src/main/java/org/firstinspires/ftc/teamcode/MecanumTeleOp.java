@@ -56,7 +56,7 @@ public class MecanumTeleOp extends OpMode {
 //        moveDuck();
         liftNoEncoder();
         intake2();
-        launchservo();
+        launcher();
         boxservo();
         boxarms();
         pullup();
@@ -99,7 +99,10 @@ public class MecanumTeleOp extends OpMode {
 
     private void liftNoEncoder() {
         if (Math.abs(gamepad2.left_stick_y) > 0.5) {
-            rb.liftmotor.setPower(0.75 * gamepad2.left_stick_y);
+            rb.boxServo.setPosition(0.2);
+            boxOpen = true;
+            rb.liftmotor.setPower(0.8 * gamepad2.left_stick_y);
+
         }
         else {
             rb.liftmotor.setPower(0);
@@ -123,26 +126,33 @@ public class MecanumTeleOp extends OpMode {
 
     private void intake2() {
 
-        if(gamepad2.right_trigger > 0.5 || gamepad2.left_trigger > 0.5){
+        if(gamepad2.right_trigger > 0.5 || gamepad2.left_trigger > 0.5) {
             rb.intakemotor.setPower((gamepad2.right_trigger + gamepad2.left_trigger)/2);
+            rb.boxServo.setPosition(0.8);
+            boxOpen = false;
         }
 
         else if(gamepad2.left_bumper || gamepad2.right_bumper){
-            rb.intakemotor.setPower(-0.25);
+            rb.intakemotor.setPower(-0.5);
+        }
+        else if(gamepad2.left_bumper && gamepad2.right_bumper){
+            rb.intakemotor.setPower(-1);
         }
         else {
             rb.intakemotor.setPower(0);
         }
     }
 
-    private void launchservo() {
+    private void launcher() {
         if(gamepad1.y) {
             telemetry.addData("Pressed", gamepad1.y);
-            rb.launcher.setPosition(1);
+            rb.launcher.setPosition(0.6);
+            telemetry.addData("Launcher Position", rb.launcher.getPosition());
         }
         else if(gamepad1.a){
-            telemetry.addData("Pressed", gamepad1.y);
-            rb.launcher.setPosition(0.0);
+            telemetry.addData("Pressed", gamepad1.a);
+            rb.launcher.setPosition(0.2);
+            telemetry.addData("Launcher Position", rb.launcher.getPosition());
         }
     }
 
@@ -198,6 +208,10 @@ public class MecanumTeleOp extends OpMode {
                 rb.pMotor2.setPower(0);
             }
         }
+        else{
+            rb.pMotor1.setPower(0);
+            rb.pMotor2.setPower(0);
+        }
     }
 
 
@@ -210,8 +224,8 @@ public class MecanumTeleOp extends OpMode {
 
 
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
-        double frontLeftPower = (y + x + rx) / denominator;
-        double backLeftPower = (y - x + rx) / denominator;
+        double frontLeftPower = (y - x + rx) / denominator;
+        double backLeftPower = (y + x + rx) / denominator;
         double frontRightPower = (y - x - rx) / denominator;
         double backRightPower = (y + x - rx) / denominator;
 
