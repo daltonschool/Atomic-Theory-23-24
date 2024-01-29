@@ -26,6 +26,7 @@ public class FieldCentricDrive extends LinearOpMode {
 
         while (opModeIsActive()) {
             fieldCentricDriveChassis();
+
         }
     }
 
@@ -74,8 +75,8 @@ public class FieldCentricDrive extends LinearOpMode {
         rotY = rotY * 1;
 
         double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
-        double frontLeftPower = (rotY + rotX + rx) / denominator;
-        double backLeftPower = (rotY - rotX + rx) / denominator;
+        double frontLeftPower = (rotY - rotX + rx) / denominator;
+        double backLeftPower = (rotY + rotX + rx) / denominator;
         double frontRightPower = (rotY - rotX - rx) / denominator;
         double backRightPower = (rotY + rotX - rx) / denominator;
 
@@ -83,6 +84,32 @@ public class FieldCentricDrive extends LinearOpMode {
         backLeftMotor.setPower(backLeftPower);
         frontRightMotor.setPower(frontRightPower);
         backRightMotor.setPower(backRightPower);
+    }
+
+    private void rotateRobot(double targetAngle) {
+        double startAngle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+        double endAngle = startAngle + targetAngle;
+
+        // Set motor power to rotate
+        frontLeftMotor.setPower(-0.5);
+        frontRightMotor.setPower(0.5);
+        backLeftMotor.setPower(-0.5);
+        backRightMotor.setPower(0.5);
+
+        // Rotate until the desired angle is reached
+        while (opModeIsActive() && !isStopRequested()) {
+            double currentAngle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+            if ((targetAngle > 0 && currentAngle >= endAngle) || (targetAngle < 0 && currentAngle <= endAngle)) {
+                break;
+            }
+            idle();
+        }
+
+        // Stop motors after rotation
+        frontLeftMotor.setPower(0);
+        frontRightMotor.setPower(0);
+        backLeftMotor.setPower(0);
+        backRightMotor.setPower(0);
     }
 }
 

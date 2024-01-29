@@ -53,7 +53,7 @@ import java.util.concurrent.TimeUnit;
 public class DriveToAprilTag extends LinearOpMode
 {
     // Adjust these numbers to suit your robot.
-    final double DESIRED_DISTANCE = 12.0; //  this is how close the camera should get to the target (inches)
+    final double DESIRED_DISTANCE = 8.0; //  this is how close the camera should get to the target (inches)
 
     //  Set the GAIN constants to control the relationship between the measured position error, and how much power is
     //  applied to the drive motors to correct the error.
@@ -69,7 +69,7 @@ public class DriveToAprilTag extends LinearOpMode
     private DcMotor bl = null, br = null, fr = null, fl = null;
 
     private static final boolean USE_WEBCAM = true;  // Set true to use a webcam, or false for a phone camera
-    private static final int DESIRED_TAG_ID = 0;     // Choose the tag you want to approach or set to -1 for ANY tag.
+    private static final int DESIRED_TAG_ID = -1;     // Choose the tag you want to approach or set to -1 for ANY tag.
     private VisionPortal visionPortal;               // Used to manage the video source.
     private AprilTagProcessor aprilTag;              // Used for managing the AprilTag detection process.
     private AprilTagDetection desiredTag = null;     // Used to hold the data for a detected AprilTag
@@ -149,9 +149,9 @@ public class DriveToAprilTag extends LinearOpMode
             } else {
 
                 // drive using manual POV Joystick mode.
-                drive = -gamepad1.left_stick_y  / 2.0;  // Reduce drive rate to 50%.
-                turn  = -gamepad1.right_stick_x / 4.0;  // Reduce turn rate to 25%.
-                strafe = gamepad1.left_stick_x/2.0;
+                drive = -gamepad1.left_stick_y;  // Reduce drive rate to 50%.
+                turn  = -gamepad1.right_stick_x / 1.5;  // Reduce turn rate to 25%.
+                strafe = gamepad1.left_stick_x;
 
                 telemetry.addData("Manual","Drive %5.2f, Turn %5.2f", drive, turn);
             }
@@ -204,7 +204,7 @@ public class DriveToAprilTag extends LinearOpMode
         // Create the vision portal by using a builder.
         if (USE_WEBCAM) {
             visionPortal = new VisionPortal.Builder()
-                    .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
+                    .setCamera(hardwareMap.get(WebcamName.class, "Webcam"))
                     .addProcessor(aprilTag)
                     .build();
         } else {

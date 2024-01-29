@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -9,112 +8,71 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
-@TeleOp(name="IMU test")
-public class Imu_test extends LinearOpMode {
-    static RevHubOrientationOnRobot.LogoFacingDirection[] logoFacingDirections
-            = RevHubOrientationOnRobot.LogoFacingDirection.values();
-    static RevHubOrientationOnRobot.UsbFacingDirection[] usbFacingDirections
-            = RevHubOrientationOnRobot.UsbFacingDirection.values();
-    static int LAST_DIRECTION = logoFacingDirections.length - 1;
-    static float TRIGGER_THRESHOLD = 0.2f;
 
+
+
+@TeleOp(name = "Sensor: IMU Orthogonal", group = "Sensor")
+public class Imu_test extends LinearOpMode
+{
+    // The IMU sensor object
     IMU imu;
-    int logoFacingDirectionPosition;
-    int usbFacingDirectionPosition;
-    boolean orientationIsValid = true;
+
+    //----------------------------------------------------------------------------------------------
+    // Main logic
+    //----------------------------------------------------------------------------------------------
 
     @Override public void runOpMode() throws InterruptedException {
+
+        // Retrieve and initialize the IMU.
+        // This sample expects the IMU to be in a REV Hub and named "imu".
         imu = hardwareMap.get(IMU.class, "imu");
-        logoFacingDirectionPosition = 0; // CHANGE THIS
-        usbFacingDirectionPosition = 0; // CHANGE THIS
 
-        updateOrientation();
+        /* Define how the hub is mounted on the robot to get the correct Yaw, Pitch and Roll values.
+         *
+         * Two input parameters are required to fully specify the Orientation.
+         * The first parameter specifies the direction the printed logo on the Hub is pointing.
+         * The second parameter specifies the direction the USB connector on the Hub is pointing.
+         * All directions are relative to the robot, and left/right is as-viewed from behind the robot.
+         */
 
-        boolean justChangedLogoDirection = false;
-        boolean justChangedUsbDirection = false;
+        /* The next two lines define Hub orientation.
+         * The Default Orientation (shown) is when a hub is mounted horizontally with the printed logo pointing UP and the USB port pointing FORWARD.
+         *
+         * To Do:  EDIT these two lines to match YOUR mounting configuration.
+         */
+        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.UP;
+        RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
 
+        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
 
+        // Now initialize the IMU with this mounting orientation
+        // Note: if you choose two conflicting directions, this initialization will cause a code exception.
+        imu.initialize(new IMU.Parameters(orientationOnRobot));
+
+        // Loop and update the dashboard
         while (!isStopRequested()) {
 
+            telemetry.addData("Hub orientation", "Logo=%s   USB=%s\n ", logoDirection, usbDirection);
+
+            // Check to see if heading reset is requested
             if (gamepad1.y) {
                 telemetry.addData("Yaw", "Resetting\n");
                 imu.resetYaw();
             } else {
-                telemetry.addData("Yaw", "Press Y (triangle) on Gamepad to reset.\n");
+                telemetry.addData("Yaw", "Press Y (triangle) on Gamepad to reset\n");
             }
 
-            if (gamepad1.left_bumper || gamepad1.right_bumper) {
-                if (!justChangedLogoDirection) {
-                    justChangedLogoDirection = true;
-                    if (gamepad1.left_bumper) {
-                        logoFacingDirectionPosition--;
-                        if (logoFacingDirectionPosition < 0) {
-                            logoFacingDirectionPosition = LAST_DIRECTION;
-                        }
-                    } else {
-                        logoFacingDirectionPosition++;
-                        if (logoFacingDirectionPosition > LAST_DIRECTION) {
-                            logoFacingDirectionPosition = 0;
-                        }
-                    }
-                    updateOrientation();
-                }
-            } else {
-                justChangedLogoDirection = false;
-            }
+            // Retrieve Rotational Angles and Velocities
+            YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
+            AngularVelocity angularVelocity = imu.getRobotAngularVelocity(AngleUnit.DEGREES);
 
-            if (gamepad1.left_trigger > TRIGGER_THRESHOLD || gamepad1.right_trigger > TRIGGER_THRESHOLD) {
-                if (!justChangedUsbDirection) {
-                    justChangedUsbDirection = true;
-                    if (gamepad1.left_trigger > TRIGGER_THRESHOLD) {
-                        usbFacingDirectionPosition--;
-                        if (usbFacingDirectionPosition < 0) {
-                            usbFacingDirectionPosition = LAST_DIRECTION;
-                        }
-                    } else {
-                        usbFacingDirectionPosition++;
-                        if (usbFacingDirectionPosition > LAST_DIRECTION) {
-                            usbFacingDirectionPosition = 0;
-                        }
-                    }
-                    updateOrientation();
-                }
-            } else {
-                justChangedUsbDirection = false;
-            }
-
-            // Display User instructions and IMU data
-            telemetry.addData("logo Direction (set with bumpers)", logoFacingDirections[logoFacingDirectionPosition]);
-            telemetry.addData("usb Direction (set with triggers)", usbFacingDirections[usbFacingDirectionPosition] + "\n");
-
-            if (orientationIsValid) {
-                YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
-                AngularVelocity angularVelocity = imu.getRobotAngularVelocity(AngleUnit.DEGREES);
-
-                telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
-                telemetry.addData("Pitch (X)", "%.2f Deg.", orientation.getPitch(AngleUnit.DEGREES));
-                telemetry.addData("Roll (Y)", "%.2f Deg.\n", orientation.getRoll(AngleUnit.DEGREES));
-                telemetry.addData("Yaw (Z) velocity", "%.2f Deg/Sec", angularVelocity.zRotationRate);
-                telemetry.addData("Pitch (X) velocity", "%.2f Deg/Sec", angularVelocity.xRotationRate);
-                telemetry.addData("Roll (Y) velocity", "%.2f Deg/Sec", angularVelocity.yRotationRate);
-            } else {
-                telemetry.addData("Error", "Selected orientation on robot is invalid");
-            }
-
+            telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
+            telemetry.addData("Pitch (X)", "%.2f Deg.", orientation.getPitch(AngleUnit.DEGREES));
+            telemetry.addData("Roll (Y)", "%.2f Deg.\n", orientation.getRoll(AngleUnit.DEGREES));
+            telemetry.addData("Yaw (Z) velocity", "%.2f Deg/Sec", angularVelocity.zRotationRate);
+            telemetry.addData("Pitch (X) velocity", "%.2f Deg/Sec", angularVelocity.xRotationRate);
+            telemetry.addData("Roll (Y) velocity", "%.2f Deg/Sec", angularVelocity.yRotationRate);
             telemetry.update();
-        }
-    }
-
-    // apply any requested orientation changes.
-    void updateOrientation() {
-        RevHubOrientationOnRobot.LogoFacingDirection logo = logoFacingDirections[logoFacingDirectionPosition];
-        RevHubOrientationOnRobot.UsbFacingDirection usb = usbFacingDirections[usbFacingDirectionPosition];
-        try {
-            RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logo, usb);
-            imu.initialize(new IMU.Parameters(orientationOnRobot));
-            orientationIsValid = true;
-        } catch (IllegalArgumentException e) {
-            orientationIsValid = false;
         }
     }
 }
