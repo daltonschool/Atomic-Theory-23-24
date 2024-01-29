@@ -147,15 +147,15 @@ public class MecanumRobot {
     }
 
     void driveForward(double power) {
-        flMotor.setPower(-power);
+        flMotor.setPower(power);
         blMotor.setPower(power);
-        frMotor.setPower(-power);
-        brMotor.setPower(-power);
+        frMotor.setPower(power);
+        brMotor.setPower(power);
     }
 
     void strafeRight(double power) {
-        flMotor.setPower(power);
-        blMotor.setPower(-power);
+        flMotor.setPower(-power);
+        blMotor.setPower(power);
         frMotor.setPower(-power);
         brMotor.setPower(power);
     }
@@ -197,7 +197,7 @@ public class MecanumRobot {
         power = Math.abs(power);
         double positionChange = inches * COUNTS_PER_INCH;
         int oldPosition = motor.getCurrentPosition();
-        double targetPosition = oldPosition - positionChange; // minus not plus, flipped motor
+        double targetPosition = oldPosition + positionChange; // minus not plus, flipped motor
 
         if (positionChange > 0) {
             driveForward(power);

@@ -12,8 +12,8 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 
-@Autonomous(name = "RedCloseAuto")
-public class RedCloseAuto extends LinearOpMode {
+@Autonomous(name = "BlueFarAuto")
+public class BlueFarAuto extends LinearOpMode {
 
     /**
      * Amount of time elapsed
@@ -114,20 +114,9 @@ public class RedCloseAuto extends LinearOpMode {
         // Deposit the box on the correct level
 
 //       encoder auto CHANGE HERE
-        rb.strafeRightByEncoder(20, rb.frMotor, 0.6);
+        rb.strafeRightByEncoder(19, rb.frMotor, 0.5);
         sleep(1000);
-        liftByEncoder(-800, -0.5);
-        rb.armServo1.setPosition(0.8);
-        rb.armServo2.setPosition(0.8);
-        sleep(4000);
-        rb.driveForwardByEncoder(-9, rb.frMotor, -0.3);
-        rb.boxServo.setPosition(0.8);
-        sleep(3500);
-        rb.armServo1.setPosition(0.4);
-        rb.armServo2.setPosition(0.4);
-        sleep(3000);
-        liftByEncoder(0, 0.5);
-        sleep(800);
+
 
 
 
@@ -186,7 +175,7 @@ public class RedCloseAuto extends LinearOpMode {
         while (Math.abs(currposition - encoder) > 10){
             rb.liftmotor.setPower(power);
 
-            currposition -= (currposition - encoder)/(Math.abs(currposition - encoder));
+            currposition += (currposition - encoder)/(Math.abs(currposition - encoder));
 
             telemetry.addData("pos", currposition);
             telemetry.update();

@@ -99,6 +99,8 @@ public class MecanumTeleOp extends OpMode {
 
     private void liftNoEncoder() {
         if (Math.abs(gamepad2.left_stick_y) > 0.5) {
+            telemetry.addData("Starting at",
+                    rb.liftmotor.getCurrentPosition());
             rb.boxServo.setPosition(0.2);
             boxOpen = true;
             rb.liftmotor.setPower(0.8 * gamepad2.left_stick_y);
@@ -144,15 +146,12 @@ public class MecanumTeleOp extends OpMode {
     }
 
     private void launcher() {
-        if(gamepad1.y) {
-            telemetry.addData("Pressed", gamepad1.y);
-            rb.launcher.setPosition(0.6);
-            telemetry.addData("Launcher Position", rb.launcher.getPosition());
-        }
-        else if(gamepad1.a){
-            telemetry.addData("Pressed", gamepad1.a);
-            rb.launcher.setPosition(0.2);
-            telemetry.addData("Launcher Position", rb.launcher.getPosition());
+        if(gamepad1.dpad_up) {
+            if(gamepad1.y) {
+                telemetry.addData("Pressed", gamepad1.y);
+                rb.launcher.setPosition(0.6);
+                telemetry.addData("Launcher Position", rb.launcher.getPosition());
+            }
         }
     }
 
@@ -178,7 +177,7 @@ public class MecanumTeleOp extends OpMode {
     private void boxarms() {
         //box arms
         if (!BisPressed) {
-            if (gamepad2.b) {
+            if (gamepad2.x) {
                 BisPressed = true;
                 if (boxRaised) {
                     rb.armServo1.setPosition(0.4);
@@ -191,7 +190,7 @@ public class MecanumTeleOp extends OpMode {
                 }
             }
         } else{
-            if (!gamepad2.b) {
+            if (!gamepad2.x) {
                 BisPressed = false;
             }
         }

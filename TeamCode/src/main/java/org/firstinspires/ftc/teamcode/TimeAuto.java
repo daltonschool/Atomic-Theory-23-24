@@ -15,6 +15,7 @@ public class TimeAuto extends LinearOpMode{
     private DcMotor fr = null;
     private DcMotor bl = null;
     private DcMotor br = null;
+    private DcMotor intake = null;
 
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -30,6 +31,7 @@ public class TimeAuto extends LinearOpMode{
         fr = hardwareMap.get(DcMotor.class, "fr");
         bl  = hardwareMap.get(DcMotor.class, "bl");
         br = hardwareMap.get(DcMotor.class, "br");
+        intake = hardwareMap.get(DcMotor.class, "intake");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
@@ -53,6 +55,8 @@ public class TimeAuto extends LinearOpMode{
         fr.setPower(-FORWARD_SPEED);
         bl.setPower(-FORWARD_SPEED);
         br.setPower(-FORWARD_SPEED);
+        intake.setPower(-1);
+
         runtime.reset();
         while (opModeIsActive() && (runtime.seconds() < 1.0)) {
             telemetry.addData("Path", "Leg 1: %4.1f S Elapsed", runtime.seconds());

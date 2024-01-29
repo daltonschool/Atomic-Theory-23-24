@@ -12,8 +12,8 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 
-@Autonomous(name = "RedCloseAuto")
-public class RedCloseAuto extends LinearOpMode {
+@Autonomous(name = "BlueCloseAuto")
+public class BlueCloseAuto extends LinearOpMode {
 
     /**
      * Amount of time elapsed
@@ -114,7 +114,7 @@ public class RedCloseAuto extends LinearOpMode {
         // Deposit the box on the correct level
 
 //       encoder auto CHANGE HERE
-        rb.strafeRightByEncoder(20, rb.frMotor, 0.6);
+        rb.strafeRightByEncoder(-20, rb.frMotor, 0.6);
         sleep(1000);
         liftByEncoder(-800, -0.5);
         rb.armServo1.setPosition(0.8);
