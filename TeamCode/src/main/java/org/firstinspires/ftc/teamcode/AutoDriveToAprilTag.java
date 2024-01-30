@@ -49,7 +49,7 @@ import java.util.concurrent.TimeUnit;
  *
  */
 
-@Autonomous(name="Drive To AprilTag")
+@Autonomous(name="Auto: Drive To AprilTag")
 public class AutoDriveToAprilTag extends LinearOpMode
 {
     // Adjust these numbers to suit your robot.

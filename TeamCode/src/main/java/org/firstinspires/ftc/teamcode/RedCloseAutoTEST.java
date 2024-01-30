@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
-@Autonomous(name = "RedCloseAuto")
+@Autonomous(name = "RedCloseAutoTest")
 public class RedCloseAutoTEST extends LinearOpMode {
     // For April TAG navigation
     final double DESIRED_DISTANCE = 5.0; //  this is how close the camera should get to the target (inches)
