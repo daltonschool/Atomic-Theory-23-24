@@ -239,19 +239,16 @@ public class imuAutoTest extends LinearOpMode {
         //          holdHeading() is used after turns to let the heading stabilize
         //          Add a sleep(2000) after any step to keep the telemetry data visible for review
         telemetry.update();
-        strafeRight(DRIVE_SPEED, -10.0, 0.0);
-        turnToHeading( TURN_SPEED, 90.0);
-        holdHeading( TURN_SPEED, 90.0, 0.5);
 
-        if(level == 3){
-            driveStraight(DRIVE_SPEED, 5.0, 0.0);
+        if(level == 1){
+            driveStraight(DRIVE_SPEED, 15.0, 0.0);
             sleep(200);
-            turnToHeading( TURN_SPEED, -30.0);
-            holdHeading( TURN_SPEED, 30.0, 0.5);
+            turnToHeading( TURN_SPEED, -60.0);
+            holdHeading( TURN_SPEED, -60.0, 0.5);
             sleep(1000);
 
 
-            driveStraight(DRIVE_SPEED, 15, 0);
+            driveStraight(DRIVE_SPEED, 5, 0);
             sleep(5000);
 
 
@@ -264,21 +261,21 @@ public class imuAutoTest extends LinearOpMode {
         else if(level == 2){
             driveStraight(DRIVE_SPEED, 20.0, 0.0);
             //intake out
-            driveStraight(DRIVE_SPEED, -18, 0);
+            driveStraight(DRIVE_SPEED, -17, 0);
 
 
             turnToHeading( TURN_SPEED, -90.0);
             holdHeading( TURN_SPEED, -90.0, 0.5);
         }
         else{
-            driveStraight(DRIVE_SPEED, 5.0, 0.0);
+            driveStraight(DRIVE_SPEED, 15.0, 0.0);
             sleep(200);
-            turnToHeading( TURN_SPEED, -30.0);
-            holdHeading( TURN_SPEED, 30.0, 0.5);
+            turnToHeading( TURN_SPEED, 60.0);
+            holdHeading( TURN_SPEED, 60.0, 0.5);
             sleep(1000);
 
 
-            driveStraight(DRIVE_SPEED, 15, 0);
+            driveStraight(DRIVE_SPEED, 5, 0);
             sleep(5000);
 
 
