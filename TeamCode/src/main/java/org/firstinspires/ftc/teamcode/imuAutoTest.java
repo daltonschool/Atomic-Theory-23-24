@@ -2,14 +2,19 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvWebcam;
 
 /*
  *  This OpMode illustrates the concept of driving an autonomous path based on Gyro (IMU) heading and encoder counts.
@@ -59,9 +64,19 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
  *  Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Robot: Auto Drive By Gyro", group="Robot")
+@Autonomous(name="IMU Auto", group="Robot")
 
-public class imuAuto extends LinearOpMode {
+public class imuAutoTest extends LinearOpMode {
+    private ElapsedTime runtime = new ElapsedTime();
+    OpenCvWebcam webcam;
+    OpenCvWebcam frontWebcam;
+
+    MecanumRobot rb = new MecanumRobot();
+
+    public static void resetEncoder(DcMotor motor) {
+        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
 
     /* Declare OpMode members. */
     private DcMotor bl = null, br = null, fr = null, fl = null;
@@ -140,12 +155,77 @@ public class imuAuto extends LinearOpMode {
         bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam"), cameraMonitorViewId);
+        PixelRecognizer pipeline = new PixelRecognizer();
+        webcam.setPipeline(pipeline);
+        webcam.setMillisecondsPermissionTimeout(2500);
+        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
 
+
+            @Override
+            public void onOpened() {
+                webcam.startStreaming(320, 180, OpenCvCameraRotation.UPRIGHT);
+                telemetry.addData("Status", "Webcam on");
+
+                telemetry.update();
+
+            }
+
+            @Override
+            public void onError(int errorCode) {
+                // This will be called if the camera could not be opened
+            }
+        });
         // Wait for the game to start (Display Gyro value while waiting)
         while (opModeInInit()) {
             telemetry.addData(">", "Robot Heading = %4.0f", getHeading());
             telemetry.update();
+            telemetry.addData("Status", "Initializing");
+
+            rb.init(hardwareMap, this);
+
+            rb.flMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            rb.frMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            rb.blMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            rb.brMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            rb.liftmotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+            rb.liftmotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            rb.liftmotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            rb.liftmotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+            rb.frMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            rb.frMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            rb.frMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+            telemetry.addData("Status", "Initialized");
+
+            telemetry.update();
         }
+
+        runtime.reset();
+//
+        int level;
+        int[] counts = {0,0,0};
+        for(int i=0;i<50;i++) {
+            if(pipeline.getShippingHubLevel() == 0) {
+                i = 0;
+                continue;
+            }
+            counts[pipeline.getShippingHubLevel() - 1] ++;
+        }
+
+        if(counts[0] > counts[1] && counts[0] > counts[2]) {
+            level = 1; //left
+        } else if(counts[1] > counts[0] && counts[1] > counts[2]) {
+            level = 2; //middle
+        } else {
+            level = 3; //right
+        }
+        telemetry.addData("Team Element Location", level);
+        telemetry.update();
+        telemetry.addData("Team Element Location", level);
 
         // Set the encoders for closed loop speed control, and reset the heading.
         fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -158,10 +238,55 @@ public class imuAuto extends LinearOpMode {
         // Notes:   Reverse movement is obtained by setting a negative distance (not speed)
         //          holdHeading() is used after turns to let the heading stabilize
         //          Add a sleep(2000) after any step to keep the telemetry data visible for review
+        telemetry.update();
+        strafeRight(DRIVE_SPEED, -10.0, 0.0);
+        turnToHeading( TURN_SPEED, 90.0);
+        holdHeading( TURN_SPEED, 90.0, 0.5);
 
-        driveStraight(DRIVE_SPEED, 24.0, 0.0);    // Drive Forward 24"
-        turnToHeading( TURN_SPEED, -90.0);               // Turn  CW to -45 Degrees
-        holdHeading( TURN_SPEED, -90.0, 0.5);   // Hold -45 Deg heading for a 1/2 second
+        if(level == 3){
+            driveStraight(DRIVE_SPEED, 5.0, 0.0);
+            sleep(200);
+            turnToHeading( TURN_SPEED, -30.0);
+            holdHeading( TURN_SPEED, 30.0, 0.5);
+            sleep(1000);
+
+
+            driveStraight(DRIVE_SPEED, 15, 0);
+            sleep(5000);
+
+
+            driveStraight(DRIVE_SPEED, -18, 0);
+            turnToHeading( TURN_SPEED, -90.0);
+            holdHeading( TURN_SPEED, -90.0, 0.5);
+
+
+        }
+        else if(level == 2){
+            driveStraight(DRIVE_SPEED, 20.0, 0.0);
+            //intake out
+            driveStraight(DRIVE_SPEED, -18, 0);
+
+
+            turnToHeading( TURN_SPEED, -90.0);
+            holdHeading( TURN_SPEED, -90.0, 0.5);
+        }
+        else{
+            driveStraight(DRIVE_SPEED, 5.0, 0.0);
+            sleep(200);
+            turnToHeading( TURN_SPEED, -30.0);
+            holdHeading( TURN_SPEED, 30.0, 0.5);
+            sleep(1000);
+
+
+            driveStraight(DRIVE_SPEED, 15, 0);
+            sleep(5000);
+
+
+            driveStraight(DRIVE_SPEED, -18, 0);
+            turnToHeading( TURN_SPEED, -90.0);
+            holdHeading( TURN_SPEED, -90.0, 0.5);
+        }
+
 
 //        driveStraight(DRIVE_SPEED, 17.0, -45.0);  // Drive Forward 17" at -45 degrees (12"x and 12"y)
 //        turnToHeading( TURN_SPEED,  45.0);               // Turn  CCW  to  45 Degrees

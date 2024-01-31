@@ -28,11 +28,11 @@ public class PixelRecognizer extends OpenCvPipeline {
     // Create two possible boxes it can be in
     static final Rect LEFTBOX = new Rect(
             new Point(100, 0),
-            new Point(210, 100)
+            new Point(210, 50)
     );
     static final Rect RIGHTBOX = new Rect(
             new Point(211, 0),
-            new Point(320, 100)
+            new Point(320, 50)
     );
 
     @Override
@@ -50,10 +50,10 @@ public class PixelRecognizer extends OpenCvPipeline {
         Imgproc.rectangle(mat, RIGHTBOX, new Scalar(255, 0, 0), 2);
         // If neither value is high enough , then the shipping hub level is 3, otherwise we continue
         if (leftValue > 1 || rightValue > 1){
-            if (leftValue >= rightValue){
+            if (leftValue <= rightValue){
                 shippingHubLevel = 1;
                 Imgproc.rectangle(mat, LEFTBOX, new Scalar(0, 255, 0), 2);
-            } else if (leftValue < rightValue) {
+            } else if (leftValue > rightValue) {
                 shippingHubLevel = 2;
                 Imgproc.rectangle(mat, RIGHTBOX, new Scalar(0, 255, 0), 2);
             }
@@ -61,7 +61,6 @@ public class PixelRecognizer extends OpenCvPipeline {
             shippingHubLevel = 3;
         }
 
-        // I think this stops a memory leak?
         left.release();
         right.release();
         return mat;
