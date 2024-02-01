@@ -55,7 +55,7 @@ public class imuAutoTest extends LinearOpMode {
     static final double     WHEEL_DIAMETER_INCHES   = 3.77953 ;
     static final double     COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
 
-    static final double     DRIVE_SPEED             = 0.4;     // Max driving speed for better distance accuracy.
+    static final double     DRIVE_SPEED             = 0.3;     // Max driving speed for better distance accuracy.
     static final double     TURN_SPEED              = 0.2;     // Max Turn speed to limit turn rate
     static final double     HEADING_THRESHOLD       = 1.0 ;    // How close must the heading get to the target before moving to next step.
     static final double     P_TURN_GAIN            = 0.02;     // Larger is more responsive, but also less stable
@@ -178,49 +178,53 @@ public class imuAutoTest extends LinearOpMode {
         //          holdHeading() is used after turns to let the heading stabilize
         //          Add a sleep(2000) after any step to keep the telemetry data visible for review
         telemetry.update();
-
+        sleep(3000);
+        strafeRight(DRIVE_SPEED + 0.3, 500, 0.0);
+        sleep(100000);
         if(level == 1){
-            driveStraight(DRIVE_SPEED, 15.0, 0.0);
-            sleep(200);
-            turnToHeading( TURN_SPEED, -60.0);
-            holdHeading( TURN_SPEED, -60.0, 0.5);
-            sleep(1000);
+            driveStraight(DRIVE_SPEED, -15, 0.0);
+            sleep(250);
+            strafeRight(DRIVE_SPEED, 5, 0.0);
+            sleep(250);
 
 
-            driveStraight(DRIVE_SPEED, 5, 0);
+            driveStraight(DRIVE_SPEED, -2.5, 0);
             sleep(5000);
-
-
-            driveStraight(DRIVE_SPEED, -18, 0);
-            turnToHeading( TURN_SPEED, -90.0);
-            holdHeading( TURN_SPEED, -90.0, 0.5);
-
 
         }
         else if(level == 2){
-            driveStraight(DRIVE_SPEED, 20.0, 0.0);
-            //intake out
-            driveStraight(DRIVE_SPEED, -17, 0);
-
-
-            turnToHeading( TURN_SPEED, -90.0);
-            holdHeading( TURN_SPEED, -90.0, 0.5);
-        }
-        else{
-            driveStraight(DRIVE_SPEED, 15.0, 0.0);
-            sleep(200);
-            turnToHeading( TURN_SPEED, 60.0);
-            holdHeading( TURN_SPEED, 60.0, 0.5);
-            sleep(1000);
-
+            driveStraight(DRIVE_SPEED, -21.0, 0.0);
 
             driveStraight(DRIVE_SPEED, 5, 0);
+
+
+            turnToHeading( TURN_SPEED, -60.0);
+            holdHeading( TURN_SPEED, -60.0, 0.5);
+
+            driveStraight(DRIVE_SPEED, -5.0, 0);
+
+            turnToHeading( TURN_SPEED, 0);
+            holdHeading( TURN_SPEED, 0, 0.5);
+
+            driveStraight(DRIVE_SPEED, -10.0, 0.0);
+
+            turnToHeading( TURN_SPEED, -90);
+            holdHeading( TURN_SPEED, -90, 0.5);
+
+            driveStraight(DRIVE_SPEED, 50.0, 0.0);
+
+        }
+        else{
+            driveStraight(DRIVE_SPEED, -15.0, 0.0);
+            sleep(200);
+            turnToHeading( TURN_SPEED, 75.0);
+            holdHeading( TURN_SPEED, 75.0, 0.5);
+            sleep(250);
+
+
+            driveStraight(DRIVE_SPEED, -4.5, 0);
             sleep(5000);
 
-
-            driveStraight(DRIVE_SPEED, -18, 0);
-            turnToHeading( TURN_SPEED, -90.0);
-            holdHeading( TURN_SPEED, -90.0, 0.5);
         }
 
 
@@ -302,14 +306,11 @@ public class imuAutoTest extends LinearOpMode {
                 if (distance < 0)
                     turnSpeed *= -1.0;
 
-                // Apply the turning correction to the current driving speed.
                 moveRobot(driveSpeed, turnSpeed, 0);
 
-                // Display drive status for the driver.
                 sendTelemetry(true);
             }
 
-            // Stop all motion & Turn off RUN_TO_POSITION
             moveRobot(0, 0, 0);
             fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -320,17 +321,14 @@ public class imuAutoTest extends LinearOpMode {
 
     public void strafeRight(double maxDriveSpeed, double distance, double heading) {
 
-        // Ensure that the OpMode is still active
         if (opModeIsActive()) {
 
-            // Determine new target position, and pass to motor controller
             int moveCounts = (int)(distance * COUNTS_PER_INCH);
             flTarget = fl.getCurrentPosition() - moveCounts;
             frTarget = fr.getCurrentPosition() + moveCounts;
             blTarget = bl.getCurrentPosition() + moveCounts;
             brTarget = br.getCurrentPosition() - moveCounts;
 
-            // Set Target FIRST, then turn on RUN_TO_POSITION
             fl.setTargetPosition(flTarget);
             fr.setTargetPosition(frTarget);
             bl.setTargetPosition(blTarget);
@@ -342,30 +340,23 @@ public class imuAutoTest extends LinearOpMode {
             bl.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             br.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-            // Set the required driving speed  (must be positive for RUN_TO_POSITION)
-            // Start driving straight, and then enter the control loop
+
             maxDriveSpeed = Math.abs(maxDriveSpeed);
             moveRobot(0,0, maxDriveSpeed);
 
-            // keep looping while we are still active, and BOTH motors are running.
             while (opModeIsActive() &&
                     (fl.isBusy() && fr.isBusy() && bl.isBusy() && br.isBusy())) {
 
-                // Determine required steering to keep on heading
+
                 turnSpeed = getSteeringCorrection(heading, P_DRIVE_GAIN);
 
-                // if driving in reverse, the motor correction also needs to be reversed
                 if (distance < 0)
                     turnSpeed *= -1.0;
-
-                // Apply the turning correction to the current driving speed.
                 moveRobot(0, turnSpeed, driveSpeed);
-
-                // Display drive status for the driver.
                 sendTelemetry(true);
             }
 
-            // Stop all motion & Turn off RUN_TO_POSITION
+
             moveRobot(0, 0, 0);
             fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -374,23 +365,10 @@ public class imuAutoTest extends LinearOpMode {
         }
     }
 
-    /**
-     *  Spin on the central axis to point in a new direction.
-     *  <p>
-     *  Move will stop if either of these conditions occur:
-     *  <p>
-     *  1) Move gets to the heading (angle)
-     *  <p>
-     *  2) Driver stops the OpMode running.
-     *
-     * @param maxTurnSpeed Desired MAX speed of turn. (range 0 to +1.0)
-     * @param heading Absolute Heading Angle (in Degrees) relative to last gyro reset.
-     *              0 = fwd. +ve is CCW from fwd. -ve is CW from forward.
-     *              If a relative angle is required, add/subtract from current heading.
-     */
+
     public void turnToHeading(double maxTurnSpeed, double heading) {
 
-        // Run getSteeringCorrection() once to pre-calculate the current error
+
         getSteeringCorrection(heading, P_DRIVE_GAIN);
 
         // keep looping while we are still active, and not on heading.
@@ -413,52 +391,20 @@ public class imuAutoTest extends LinearOpMode {
         moveRobot(0, 0, 0);
     }
 
-    /**
-     *  Obtain & hold a heading for a finite amount of time
-     *  <p>
-     *  Move will stop once the requested time has elapsed
-     *  <p>
-     *  This function is useful for giving the robot a moment to stabilize it's heading between movements.
-     *
-     * @param maxTurnSpeed      Maximum differential turn speed (range 0 to +1.0)
-     * @param heading    Absolute Heading Angle (in Degrees) relative to last gyro reset.
-     *                   0 = fwd. +ve is CCW from fwd. -ve is CW from forward.
-     *                   If a relative angle is required, add/subtract from current heading.
-     * @param holdTime   Length of time (in seconds) to hold the specified heading.
-     */
     public void holdHeading(double maxTurnSpeed, double heading, double holdTime) {
 
         ElapsedTime holdTimer = new ElapsedTime();
         holdTimer.reset();
 
-        // keep looping while we have time remaining.
         while (opModeIsActive() && (holdTimer.time() < holdTime)) {
-            // Determine required steering to keep on heading
             turnSpeed = getSteeringCorrection(heading, P_TURN_GAIN);
-
-            // Clip the speed to the maximum permitted value.
             turnSpeed = Range.clip(turnSpeed, -maxTurnSpeed, maxTurnSpeed);
-
-            // Pivot in place by applying the turning correction
             moveRobot(0, turnSpeed, 0);
-
-            // Display drive status for the driver.
             sendTelemetry(false);
         }
-
-        // Stop all motion;
         moveRobot(0, 0, 0);
     }
 
-    // **********  LOW Level driving functions.  ********************
-
-    /**
-     * Use a Proportional Controller to determine how much steering correction is required.
-     *
-     * @param desiredHeading        The desired absolute heading (relative to last heading reset)
-     * @param proportionalGain      Gain factor applied to heading error to obtain turning power.
-     * @return                      Turning power needed to get to required heading.
-     */
     public double getSteeringCorrection(double desiredHeading, double proportionalGain) {
         targetHeading = desiredHeading;  // Save for telemetry
 
@@ -485,8 +431,8 @@ public class imuAutoTest extends LinearOpMode {
 
         flSpeed  = drive - turn - strafe;
         frSpeed = drive + turn + strafe;
-        blSpeed = drive - turn - strafe;
-        brSpeed = drive + turn + strafe;
+        blSpeed = drive - turn + strafe;
+        brSpeed = drive + turn - strafe;
 
         // Scale speeds down if either one exceeds +/- 1.0;
         double max = Math.max(Math.max(Math.abs(flSpeed), Math.abs(frSpeed)), Math.max(Math.abs(blSpeed), Math.abs(brSpeed)));
@@ -512,7 +458,7 @@ public class imuAutoTest extends LinearOpMode {
     private void sendTelemetry(boolean straight) {
 
         if (straight) {
-            telemetry.addData("Motion", "Drive Straight");
+            telemetry.addData("Motion", "Driving");
             telemetry.addData("Target Pos L:R",  "%7d:%7d", flTarget, frTarget);
             telemetry.addData("Actual Pos L:R",  "%7d:%7d", fl.getCurrentPosition(), fr.getCurrentPosition(), bl.getCurrentPosition(), br.getCurrentPosition());
         } else {

@@ -184,8 +184,8 @@ public class MecanumTeleOp extends OpMode {
                     rb.armServo2.setPosition(0.4);
                     boxRaised = false;
                 } else {
-                    rb.armServo1.setPosition(0.8);
-                    rb.armServo2.setPosition(0.8);
+                    rb.armServo1.setPosition(0.75);
+                    rb.armServo2.setPosition(0.75);
                     boxRaised = true;
                 }
             }
@@ -217,22 +217,22 @@ public class MecanumTeleOp extends OpMode {
 
 
     private void driveChassis() {
-        double y = -gamepad1.left_stick_y;
-        double x = gamepad1.left_stick_x;
-        double rx = gamepad1.right_stick_x * 0.85;
+        double y = -gamepad1.left_stick_y * 0.85;
+        double x = gamepad1.left_stick_x * 0.85;
+        double rx = gamepad1.right_stick_x * 0.7;
 
 
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
-        double frontLeftPower = (y - x + rx) / denominator;
-        double backLeftPower = (y + x + rx) / denominator;
-        double frontRightPower = (y + x - rx) / denominator;
-        double backRightPower = (y - x - rx) / denominator;
+        double frontLeftPower = (y + x + rx) / denominator;
+        double backLeftPower = (y - x + rx) / denominator;
+        double frontRightPower = (y - x - rx) / denominator;
+        double backRightPower = (y + x - rx) / denominator;
 
         if(gamepad1.right_trigger > 0.5) {
-            rb.flMotor.setPower(frontLeftPower * 0.25);
-            rb.blMotor.setPower(backLeftPower * 0.25);
-            rb.frMotor.setPower(frontRightPower * 0.25);
-            rb.brMotor.setPower(backRightPower * 0.25);
+            rb.flMotor.setPower(frontLeftPower * 0.35);
+            rb.blMotor.setPower(backLeftPower * 0.35);
+            rb.frMotor.setPower(frontRightPower * 0.35);
+            rb.brMotor.setPower(backRightPower * 0.35);
         }
         else {
             rb.flMotor.setPower(frontLeftPower);

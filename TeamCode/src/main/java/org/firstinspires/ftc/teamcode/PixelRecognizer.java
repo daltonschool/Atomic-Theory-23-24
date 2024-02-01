@@ -49,7 +49,7 @@ public class PixelRecognizer extends OpenCvPipeline {
         Imgproc.rectangle(mat, LEFTBOX, new Scalar(255, 0, 0), 2); // draw rectangles around the boxes
         Imgproc.rectangle(mat, RIGHTBOX, new Scalar(255, 0, 0), 2);
         // If neither value is high enough , then the shipping hub level is 3, otherwise we continue
-        if (leftValue > 1 || rightValue > 1){
+        if (leftValue > 0.8 || rightValue > 0.8){
             if (leftValue <= rightValue){
                 shippingHubLevel = 1;
                 Imgproc.rectangle(mat, LEFTBOX, new Scalar(0, 255, 0), 2);
