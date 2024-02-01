@@ -217,9 +217,9 @@ public class MecanumTeleOp extends OpMode {
 
 
     private void driveChassis() {
-        double y = -gamepad1.left_stick_y * 0.85;
-        double x = gamepad1.left_stick_x * 0.85;
-        double rx = gamepad1.right_stick_x * 0.7;
+        double y = -gamepad1.left_stick_y * 0.8;
+        double x = gamepad1.left_stick_x * 0.8;
+        double rx = gamepad1.right_stick_x * 0.65;
 
 
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
@@ -240,6 +240,11 @@ public class MecanumTeleOp extends OpMode {
             rb.frMotor.setPower(frontRightPower);
             rb.brMotor.setPower(backRightPower);
         }
+
+        telemetry.addData("",rb.flMotor.getCurrentPosition());
+        telemetry.addData("",rb.blMotor.getCurrentPosition());
+        telemetry.addData("",rb.frMotor.getCurrentPosition());
+        telemetry.addData("",rb.brMotor.getCurrentPosition());
     }
 }
 

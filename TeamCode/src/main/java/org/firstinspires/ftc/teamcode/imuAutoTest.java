@@ -42,9 +42,6 @@ public class imuAutoTest extends LinearOpMode {
     private double  targetHeading = 0;
     private double  driveSpeed    = 0;
     private double  turnSpeed     = 0;
-
-    private double  strafeSpeed     = 0;
-
     private double  flSpeed     = 0;
     private double  frSpeed    = 0;
     private double  blSpeed     = 0;
@@ -176,14 +173,9 @@ public class imuAutoTest extends LinearOpMode {
         br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         imu.resetYaw();
 
-        // Step through each leg of the path,
-        // Notes:   Reverse movement is obtained by setting a negative distance (not speed)
-        //          holdHeading() is used after turns to let the heading stabilize
-        //          Add a sleep(2000) after any step to keep the telemetry data visible for review
         telemetry.update();
         sleep(3000);
-        strafeRight(DRIVE_SPEED + 0.3, 500, 0.0);
-        sleep(100000);
+
         if(level == 1){
             driveStraight(DRIVE_SPEED, -15, 0.0);
             sleep(250);
@@ -204,12 +196,12 @@ public class imuAutoTest extends LinearOpMode {
             turnToHeading( TURN_SPEED, -60.0);
             holdHeading( TURN_SPEED, -60.0, 0.5);
 
-            driveStraight(DRIVE_SPEED, -5.0, 0);
+            driveStraight(DRIVE_SPEED, -10.0, 0);
 
             turnToHeading( TURN_SPEED, 0);
             holdHeading( TURN_SPEED, 0, 0.5);
 
-            driveStraight(DRIVE_SPEED, -10.0, 0.0);
+            driveStraight(DRIVE_SPEED, -15.0, 0.0);
 
             turnToHeading( TURN_SPEED, -90);
             holdHeading( TURN_SPEED, -90, 0.5);
@@ -309,7 +301,7 @@ public class imuAutoTest extends LinearOpMode {
                 if (distance < 0)
                     turnSpeed *= -1.0;
 
-                moveRobot(0, 0, strafeSpeed);
+                moveRobot(driveSpeed, turnSpeed, 0);
 
                 sendTelemetry(true);
             }
