@@ -42,6 +42,9 @@ public class imuAutoTest extends LinearOpMode {
     private double  targetHeading = 0;
     private double  driveSpeed    = 0;
     private double  turnSpeed     = 0;
+
+    private double  strafeSpeed     = 0;
+
     private double  flSpeed     = 0;
     private double  frSpeed    = 0;
     private double  blSpeed     = 0;
@@ -306,7 +309,7 @@ public class imuAutoTest extends LinearOpMode {
                 if (distance < 0)
                     turnSpeed *= -1.0;
 
-                moveRobot(driveSpeed, turnSpeed, 0);
+                moveRobot(0, 0, strafeSpeed);
 
                 sendTelemetry(true);
             }
