@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
@@ -40,6 +42,11 @@ public class PixelRecognizerNew extends OpenCvPipeline {
         return rightValue;
     }
 
+    static final Rect BoundingBox = new Rect(
+            new Point(100, 0),
+            new Point(320, 50)
+    );
+
     public int[] getPixelPos() {
         return new int[]{finalCenterX, finalCenterY};
     }
@@ -54,20 +61,29 @@ public class PixelRecognizerNew extends OpenCvPipeline {
         Scalar highHSV = new Scalar(150, 255, 255); // purple upper in hsv
         Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV); // convert to hsv
         Core.inRange(input, lowHSV, highHSV, mat); // make purple white, everything else black
-        for (int y = 0; y < mat.rows(); y++) {
-            for (int x = 0; x < mat.cols(); x++) {
-                double[] data = mat.get(y, x); // Get the pixel value at (y, x)
+        Mat bound = mat.submat(BoundingBox);
+        for (int y = 0; y < bound.rows(); y++) {
+            for (int x = 0; x < bound.cols(); x++) {
+                double[] data = bound.get(y, x); // Get the pixel value at (y, x)
                 if (data[0] == 255) { // Check if the pixel is white
                     // Print the coordinates of the white pixel
                     values++;
-                    centerX += x;
-                    centerY += y;
+                    centerX += x + BoundingBox.x;
+                    centerY += y + BoundingBox.y;
                 }
             }
         }
-        finalCenterX = (int)(centerX/values);
-        finalCenterY = (int)(centerY/values);
 
+        int finalCenterX = values > 0 ? (int)(centerX / values) : -1; // -1 or some error code if no white pixel is found
+        int finalCenterY = values > 0 ? (int)(centerY / values) : -1;
+
+        Imgproc.rectangle(mat, BoundingBox, new Scalar(255, 0, 0), 2); // draw rectangle around the bounding area
+
+        if (values > 0) {
+            Imgproc.circle(mat, new Point(finalCenterX, finalCenterY), 5, new Scalar(0, 255, 0), -1);
+        }
+
+        bound.release();
         return mat;
     }
 
