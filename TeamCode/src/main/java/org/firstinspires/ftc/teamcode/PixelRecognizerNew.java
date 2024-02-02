@@ -74,8 +74,8 @@ public class PixelRecognizerNew extends OpenCvPipeline {
             }
         }
 
-        int finalCenterX = values > 0 ? (int)(centerX / values) : -1; // -1 or some error code if no white pixel is found
-        int finalCenterY = values > 0 ? (int)(centerY / values) : -1;
+        int finalCenterX = values > 0 ? (int)(centerX / values) : 0; // 0 if no white pixels are found
+        int finalCenterY = values > 0 ? (int)(centerY / values) : 0;
 
         Imgproc.rectangle(mat, BoundingBox, new Scalar(255, 0, 0), 2); // draw rectangle around the bounding area
 
