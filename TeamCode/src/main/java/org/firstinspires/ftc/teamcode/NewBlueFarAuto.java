@@ -179,7 +179,6 @@ public class NewBlueFarAuto extends LinearOpMode {
         telemetry.addData("Team Element Location", level);
         telemetry.update();
 
-        liftByEncoder(800);
 
 
 
@@ -213,7 +212,7 @@ public class NewBlueFarAuto extends LinearOpMode {
             rb.armServo1.setPosition(0.4);
             rb.armServo2.setPosition(0.4);
             sleep(3000);
-            liftByEncoder(-800);
+            liftByEncoder(1200);
             rb.armServo1.setPosition(0.8);
             rb.armServo2.setPosition(0.8);
             sleep(4000);
@@ -235,7 +234,7 @@ public class NewBlueFarAuto extends LinearOpMode {
 
 
             turnToHeading(TURN_SPEED, 90.0);
-            driveStraight(DRIVE_SPEED / 2, -50.0, 90.0);
+            driveStraight(DRIVE_SPEED, -50.0, 90.0);
 //            turnToHeading( TURN_SPEED, 0.0);
 //            driveStraight(DRIVE_SPEED/2, -20.0, 0.0);
 //            turnToHeading( TURN_SPEED, 90.0);
@@ -245,10 +244,10 @@ public class NewBlueFarAuto extends LinearOpMode {
 //            rb.armServo2.setPosition(0.8);
 //            sleep(4000);
             strafeRightFixed(DRIVE_SPEED, -20.0, 90.0);
-            liftByEncoder(-350);
+            liftByEncoder(1500);
             rb.armServo1.setPosition(0.8);
             rb.armServo2.setPosition(0.8);
-            sleep(1000);
+            sleep(2000);
             driveStraight(DRIVE_SPEED, -12.0, 90.0);
             rb.boxServo.setPosition(0.8);
             sleep(1500);
