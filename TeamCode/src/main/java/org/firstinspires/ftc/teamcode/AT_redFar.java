@@ -95,7 +95,9 @@ public class AT_redFar extends LinearOpMode {
         fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
+        int[] pos = {0, 0};
+        int[] finalPos = {0, 0};
+        int cameraTicks = 0;
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam"), cameraMonitorViewId);
         PixelRecognizerNew pipeline = new PixelRecognizerNew();
@@ -119,7 +121,6 @@ public class AT_redFar extends LinearOpMode {
             }
         });
         // Wait for the game to start (Display Gyro value while waiting)
-        int[] pos = {0, 0};
         while (opModeInInit()) {
             telemetry.addData(">", "Robot Heading = %4.0f", getHeading());
             telemetry.update();
@@ -142,24 +143,15 @@ public class AT_redFar extends LinearOpMode {
             rb.frMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
             telemetry.addData("Status", "Initialized");
-
-            telemetry.update();
-
-
-//
-            for (int i = 0; i < 50; i++) {
-                if (pipeline.getPixelPos() == null) {
-                    i = 0;
-                    continue;
-                }
-                pos[0] += pipeline.getPixelPos()[0];
-                pos[1] += pipeline.getPixelPos()[1];
+            if (cameraTicks < 120) {
+                pos[0] = pipeline.getPixelPosX();
+                pos[1] = pipeline.getPixelPosY();
+                cameraTicks++;
             }
-            pos[0] = (int) (pos[0] / 50);
-            pos[1] = (int) (pos[1] / 50);
-
-            telemetry.addData("Initial Position:", pos);
-            telemetry.update();
+            else {
+                telemetry.addData("Initial Position:", pos[0]);
+                telemetry.update();
+            }
 
             // Set the encoders for closed loop speed control, and reset the heading.
             fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -171,22 +163,18 @@ public class AT_redFar extends LinearOpMode {
 
         runtime.reset();
 
-        int[] finalPos = {0, 0};
-        for (int i = 0; i < 50; i++) {
-            if (pipeline.getPixelPos() == null) {
-                i = 0;
-                continue;
-            }
-            finalPos[0] += pipeline.getPixelPos()[0];
-            finalPos[1] += pipeline.getPixelPos()[1];
+        cameraTicks = 0;
+        while (cameraTicks < 120) {
+            finalPos[0] = pipeline.getPixelPosX();
+            finalPos[1] = pipeline.getPixelPosY();
+            cameraTicks++;
+            telemetry.addData("Calibrating...", finalPos[0]);
+            telemetry.update();
+            sleep(10);
         }
-        finalPos[0] = (int) (finalPos[0] / 50);
-        finalPos[1] = (int) (finalPos[1] / 50);
 
         level = pipeline.getPixelFieldPos(pos, finalPos);
-        telemetry.addData("Final Position:", finalPos);
-        telemetry.update();
-
+        telemetry.addData("Final Position:", finalPos[0]);
         telemetry.addData("Team Element Location", level);
         telemetry.update();
 

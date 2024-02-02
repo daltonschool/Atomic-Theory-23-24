@@ -43,12 +43,16 @@ public class PixelRecognizerNew extends OpenCvPipeline {
     }
 
     static final Rect BoundingBox = new Rect(
-            new Point(100, 0),
-            new Point(320, 50)
+            new Point(0, 0),
+            new Point(320, 90)
     );
 
-    public int[] getPixelPos() {
-        return new int[]{finalCenterX, finalCenterY};
+    public int getPixelPosX() {
+        return finalCenterX;
+    }
+
+    public int getPixelPosY() {
+        return finalCenterY;
     }
 
     // Recognizes the shipping hub level based on where the team shipping element is located
@@ -74,13 +78,13 @@ public class PixelRecognizerNew extends OpenCvPipeline {
             }
         }
 
-        int finalCenterX = values > 0 ? (int)(centerX / values) : 0; // 0 if no white pixels are found
-        int finalCenterY = values > 0 ? (int)(centerY / values) : 0;
+        finalCenterX = (int)(centerX / values);
+        finalCenterY = (int)(centerY / values);
 
         Imgproc.rectangle(mat, BoundingBox, new Scalar(255, 0, 0), 2); // draw rectangle around the bounding area
 
         if (values > 0) {
-            Imgproc.circle(mat, new Point(finalCenterX, finalCenterY), 5, new Scalar(0, 255, 0), -1);
+            Imgproc.circle(mat, new Point(finalCenterX, finalCenterY), 5, new Scalar(110, 100, 25), -1);
         }
 
         bound.release();
