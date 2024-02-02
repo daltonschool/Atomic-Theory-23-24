@@ -61,6 +61,8 @@ public class imuAutoTest extends LinearOpMode {
     static final double     P_TURN_GAIN            = 0.02;     // Larger is more responsive, but also less stable
     static final double     P_DRIVE_GAIN           = 0.03;     // Larger is more responsive, but also less stable
 
+    int level;
+
 
     @Override
     public void runOpMode() {
@@ -141,40 +143,42 @@ public class imuAutoTest extends LinearOpMode {
             telemetry.addData("Status", "Initialized");
 
             telemetry.update();
+
+
+//
+            int[] counts = {0, 0, 0};
+            for (int i = 0; i < 50; i++) {
+                if (pipeline.getShippingHubLevel() == 0) {
+                    i = 0;
+                    continue;
+                }
+                counts[pipeline.getShippingHubLevel() - 1]++;
+            }
+
+            if (counts[0] > counts[1] && counts[0] > counts[2]) {
+                level = 1; //left
+            } else if (counts[1] > counts[0] && counts[1] > counts[2]) {
+                level = 2; //middle
+            } else {
+                level = 3; //right
+            }
+            telemetry.addData("Team Element Location", level);
+            telemetry.update();
+            telemetry.addData("Team Element Location", level);
+
+            // Set the encoders for closed loop speed control, and reset the heading.
+            fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            imu.resetYaw();
+
+            telemetry.update();
         }
 
         runtime.reset();
-//
-        int level;
-        int[] counts = {0,0,0};
-        for(int i=0;i<50;i++) {
-            if(pipeline.getShippingHubLevel() == 0) {
-                i = 0;
-                continue;
-            }
-            counts[pipeline.getShippingHubLevel() - 1] ++;
-        }
 
-        if(counts[0] > counts[1] && counts[0] > counts[2]) {
-            level = 1; //left
-        } else if(counts[1] > counts[0] && counts[1] > counts[2]) {
-            level = 2; //middle
-        } else {
-            level = 3; //right
-        }
-        telemetry.addData("Team Element Location", level);
-        telemetry.update();
-        telemetry.addData("Team Element Location", level);
-
-        // Set the encoders for closed loop speed control, and reset the heading.
-        fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        imu.resetYaw();
-
-        telemetry.update();
-        sleep(3000);
+        level = 2;
 
         if(level == 1){
             driveStraight(DRIVE_SPEED, -15, 0.0);
@@ -190,23 +194,32 @@ public class imuAutoTest extends LinearOpMode {
         else if(level == 2){
             driveStraight(DRIVE_SPEED, -21.0, 0.0);
 
-            driveStraight(DRIVE_SPEED, 5, 0);
+            driveStraight(DRIVE_SPEED, 18.5, 0);
 
 
-            turnToHeading( TURN_SPEED, -60.0);
-            holdHeading( TURN_SPEED, -60.0, 0.5);
-
-            driveStraight(DRIVE_SPEED, -10.0, 0);
-
-            turnToHeading( TURN_SPEED, 0);
-            holdHeading( TURN_SPEED, 0, 0.5);
-
-            driveStraight(DRIVE_SPEED, -15.0, 0.0);
-
-            turnToHeading( TURN_SPEED, -90);
-            holdHeading( TURN_SPEED, -90, 0.5);
-
-            driveStraight(DRIVE_SPEED, 50.0, 0.0);
+            turnToHeading( TURN_SPEED, 90.0);
+            driveStraight(DRIVE_SPEED/2, -50.0, 90.0);
+            turnToHeading( TURN_SPEED, 0.0);
+            driveStraight(DRIVE_SPEED/2, -20.0, 0.0);
+            turnToHeading( TURN_SPEED, 90.0);
+            driveStraight(DRIVE_SPEED/2, -15.0, 90.0);
+            liftByEncoder(-800, -0.5);
+            rb.armServo1.setPosition(0.8);
+            rb.armServo2.setPosition(0.8);
+            sleep(4000);
+            //            holdHeading( TURN_SPEED, -60.0, 0.5);
+//
+//            driveStraight(DRIVE_SPEED, -10.0, 0);
+//
+//            turnToHeading( TURN_SPEED, 0);
+//            holdHeading( TURN_SPEED, 0, 0.5);
+//
+//            driveStraight(DRIVE_SPEED, -15.0, 0.0);
+//
+//            turnToHeading( TURN_SPEED, -90);
+//            holdHeading( TURN_SPEED, -90, 0.5);
+//
+//            driveStraight(DRIVE_SPEED, 50.0, 0.0);
 
         }
         else{
@@ -319,10 +332,10 @@ public class imuAutoTest extends LinearOpMode {
         if (opModeIsActive()) {
 
             int moveCounts = (int)(distance * COUNTS_PER_INCH);
-            flTarget = fl.getCurrentPosition() - moveCounts;
-            frTarget = fr.getCurrentPosition() + moveCounts;
-            blTarget = bl.getCurrentPosition() + moveCounts;
-            brTarget = br.getCurrentPosition() - moveCounts;
+            flTarget = fl.getCurrentPosition() + moveCounts;
+            frTarget = fr.getCurrentPosition() - moveCounts;
+            blTarget = bl.getCurrentPosition() - moveCounts;
+            brTarget = br.getCurrentPosition() + moveCounts;
 
             fl.setTargetPosition(flTarget);
             fr.setTargetPosition(frTarget);
@@ -453,17 +466,17 @@ public class imuAutoTest extends LinearOpMode {
     private void sendTelemetry(boolean straight) {
 
         if (straight) {
-            telemetry.addData("Motion", "Driving");
-            telemetry.addData("Target Pos L:R",  "%7d:%7d", flTarget, frTarget);
-            telemetry.addData("Actual Pos L:R",  "%7d:%7d", fl.getCurrentPosition(), fr.getCurrentPosition(), bl.getCurrentPosition(), br.getCurrentPosition());
+//            telemetry.addData("Motion", "Driving");
+//            telemetry.addData("Target Pos L:R",  "%7d:%7d", flTarget, frTarget);
+//            telemetry.addData("Actual Pos L:R",  "%7d:%7d", fl.getCurrentPosition(), fr.getCurrentPosition(), bl.getCurrentPosition(), br.getCurrentPosition());
         } else {
-            telemetry.addData("Motion", "Turning");
+//            telemetry.addData("Motion", "Turning");
         }
 
-        telemetry.addData("Heading- Target : Current", "%5.2f : %5.0f", targetHeading, getHeading());
-        telemetry.addData("Error  : Steer Pwr",  "%5.1f : %5.1f", headingError, turnSpeed);
-        telemetry.addData("Wheel Speeds L : R", "%5.2f : %5.2f", flSpeed, frSpeed, blSpeed, brSpeed);
-        telemetry.update();
+//        telemetry.addData("Heading- Target : Current", "%5.2f : %5.0f", targetHeading, getHeading());
+//        telemetry.addData("Error  : Steer Pwr",  "%5.1f : %5.1f", headingError, turnSpeed);
+//        telemetry.addData("Wheel Speeds L : R", "%5.2f : %5.2f", flSpeed, frSpeed, blSpeed, brSpeed);
+//        telemetry.update();
     }
 
     /**
@@ -472,5 +485,20 @@ public class imuAutoTest extends LinearOpMode {
     public double getHeading() {
         YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
         return orientation.getYaw(AngleUnit.DEGREES);
+
+    }
+    void liftByEncoder(double encoder, double power) {
+        double currposition = rb.liftmotor.getCurrentPosition();
+        while (Math.abs(currposition - encoder) > 10){
+            rb.liftmotor.setPower(power);
+
+            currposition -= (currposition - encoder)/(Math.abs(currposition - encoder));
+
+            telemetry.addData("pos", currposition);
+            telemetry.update();
+
+        }
+        rb.driveStop();
     }
 }
+

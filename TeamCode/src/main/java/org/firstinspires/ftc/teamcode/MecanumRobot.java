@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 //import com.qualcomm.hardware.bosch.BNO055IMU;
@@ -59,7 +58,7 @@ public class MecanumRobot {
         blMotor.setDirection(DcMotor.Direction.REVERSE);
         brMotor.setDirection(DcMotor.Direction.FORWARD);
         pMotor1.setDirection(DcMotor.Direction.REVERSE);
-        pMotor2.setDirection(DcMotor.Direction.REVERSE);
+        pMotor2.setDirection(DcMotor.Direction.FORWARD);
         intakemotor.setDirection(DcMotor.Direction.FORWARD);
         liftmotor.setDirection(DcMotor.Direction.FORWARD);
         armServo1.setDirection(Servo.Direction.REVERSE);
@@ -147,15 +146,15 @@ public class MecanumRobot {
     }
 
     void driveForward(double power) {
-        flMotor.setPower(power);
+        flMotor.setPower(-power);
         blMotor.setPower(power);
-        frMotor.setPower(power);
-        brMotor.setPower(power);
+        frMotor.setPower(-power);
+        brMotor.setPower(-power);
     }
 
     void strafeRight(double power) {
-        flMotor.setPower(-power);
-        blMotor.setPower(power);
+        flMotor.setPower(power);
+        blMotor.setPower(-power);
         frMotor.setPower(-power);
         brMotor.setPower(power);
     }
@@ -213,6 +212,9 @@ public class MecanumRobot {
             }
             driveStop();
         }
+
+
+
     }
 
 
