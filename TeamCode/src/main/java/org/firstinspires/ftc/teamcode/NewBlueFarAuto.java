@@ -179,7 +179,7 @@ public class NewBlueFarAuto extends LinearOpMode {
         telemetry.addData("Team Element Location", level);
         telemetry.update();
 
-        liftByEncoder(-2000);
+        liftByEncoder(800);
 
 
 
@@ -616,5 +616,9 @@ public class NewBlueFarAuto extends LinearOpMode {
         rb.liftmotor.setTargetPosition(encoder);
 
         rb.liftmotor.setPower(0.4);
+
+        while ((rb.liftmotor.isBusy())) {
+        }
+        rb.liftmotor.setPower(0);
     }
 }
