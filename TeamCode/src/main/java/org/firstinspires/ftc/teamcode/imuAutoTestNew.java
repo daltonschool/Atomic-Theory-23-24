@@ -158,6 +158,9 @@ public class imuAutoTestNew extends LinearOpMode {
             pos[0] = (int) (pos[0] / 50);
             pos[1] = (int) (pos[1] / 50);
 
+            telemetry.addData("Initial Position:", pos);
+            telemetry.update();
+
             // Set the encoders for closed loop speed control, and reset the heading.
             fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -181,11 +184,10 @@ public class imuAutoTestNew extends LinearOpMode {
         finalPos[1] = (int) (finalPos[1] / 50);
 
         level = pipeline.getPixelFieldPos(pos, finalPos);
-
-        telemetry.addData("Team Element Location", level);
+        telemetry.addData("Final Position:", finalPos);
         telemetry.update();
-        telemetry.addData("Team Element Location", level);
 
+        telemetry.addData("Team Element Location", level);
         telemetry.update();
 
 
