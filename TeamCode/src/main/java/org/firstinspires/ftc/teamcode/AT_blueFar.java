@@ -170,7 +170,7 @@ public class AT_blueFar extends LinearOpMode {
             cameraTicks++;
             telemetry.addData("Calibrating...", finalPos[0]);
             telemetry.update();
-            sleep(10);
+            sleep(30);
         }
 
         level = pipeline.getPixelFieldPos(pos, finalPos);
