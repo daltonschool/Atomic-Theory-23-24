@@ -55,7 +55,7 @@ public class NewBlueFarAuto extends LinearOpMode {
     static final double     WHEEL_DIAMETER_INCHES   = 3.77953 ;
     static final double     COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.1415);
 
-    static final double     DRIVE_SPEED             = 0.3;     // Max driving speed for better distance accuracy.
+    static final double     DRIVE_SPEED             = 0.4;     // Max driving speed for better distance accuracy.
     static final double     TURN_SPEED              = 0.2;     // Max Turn speed to limit turn rate
     static final double     HEADING_THRESHOLD       = 1.0 ;    // How close must the heading get to the target before moving to next step.
     static final double     P_TURN_GAIN            = 0.02;     // Larger is more responsive, but also less stable
@@ -171,7 +171,7 @@ public class NewBlueFarAuto extends LinearOpMode {
             cameraTicks++;
             telemetry.addData("Calibrating...", finalPos[0]);
             telemetry.update();
-            sleep(10);
+            sleep(15);
         }
 
         level = pipeline.getPixelFieldPos(pos, finalPos);
@@ -181,76 +181,53 @@ public class NewBlueFarAuto extends LinearOpMode {
 
 
 
-
-
         if (level == 1) {
-            driveStraight(DRIVE_SPEED, -21.0, 0.0);
-            rb.strafeRightByEncoder(6, rb.frMotor, 0.6);
-
-            driveStraight(DRIVE_SPEED, 18.5, 0);
-            rb.strafeRightByEncoder(-6, rb.frMotor, 0.6);
+            driveStraight(DRIVE_SPEED, -20.5, 0.0);
 
             turnToHeading(TURN_SPEED, 90.0);
-            driveStraight(DRIVE_SPEED / 2, -50.0, 90.0);
-//            turnToHeading( TURN_SPEED, 0.0);
-//            driveStraight(DRIVE_SPEED/2, -20.0, 0.0);
-//            turnToHeading( TURN_SPEED, 90.0);
-//            driveStraight(DRIVE_SPEED/2, -15.0, 90.0);
-//            liftByEncoder(-800, -0.5);
-//            rb.armServo1.setPosition(0.8);
-//            rb.armServo2.setPosition(0.8);
-//            sleep(4000);
-            rb.strafeRightByEncoder(-20, rb.frMotor, 0.6);
-            sleep(1000);
-            liftByEncoder(-800);
-            rb.armServo1.setPosition(0.8);
-            rb.armServo2.setPosition(0.8);
-            sleep(4000);
-            rb.driveForwardByEncoder(-9, rb.frMotor, -0.3);
-            rb.boxServo.setPosition(0.8);
-            sleep(3500);
-            rb.armServo1.setPosition(0.4);
-            rb.armServo2.setPosition(0.4);
-            sleep(3000);
-            liftByEncoder(1200);
-            rb.armServo1.setPosition(0.8);
-            rb.armServo2.setPosition(0.8);
-            sleep(4000);
-            rb.driveForwardByEncoder(-4, rb.frMotor, -0.3);
-            rb.boxServo.setPosition(0.8);
-            sleep(3500);
-            rb.armServo1.setPosition(0.4);
-            rb.armServo2.setPosition(0.4);
-            sleep(3000);
-            liftByEncoder(0);
-            sleep(800);
-            rb.strafeRightByEncoder(-10, rb.frMotor, 0.6);
+            driveStraight(DRIVE_SPEED, -5.0, 90.0);
 
-        } else if (level == 2) {
+            driveStraight(DRIVE_SPEED, 5.0, 90.0);
 
-            driveStraight(DRIVE_SPEED, -21.0, 0.0);
+            turnToHeading(TURN_SPEED, 0);
 
-            driveStraight(DRIVE_SPEED, 18.5, 0);
-
+            driveStraight(DRIVE_SPEED, 18.0, 0);
 
             turnToHeading(TURN_SPEED, 90.0);
             driveStraight(DRIVE_SPEED, -50.0, 90.0);
-//            turnToHeading( TURN_SPEED, 0.0);
-//            driveStraight(DRIVE_SPEED/2, -20.0, 0.0);
-//            turnToHeading( TURN_SPEED, 90.0);
-//            driveStraight(DRIVE_SPEED/2, -15.0, 90.0);
-//            liftByEncoder(-800, -0.5);
-//            rb.armServo1.setPosition(0.8);
-//            rb.armServo2.setPosition(0.8);
-//            sleep(4000);
-            strafeRightFixed(DRIVE_SPEED, -20.0, 90.0);
-            liftByEncoder(1500);
+            strafeRightFixed(DRIVE_SPEED, -15.0, 90.0);
+            liftByEncoder(1700);
             rb.armServo1.setPosition(0.8);
             rb.armServo2.setPosition(0.8);
-            sleep(2000);
+            sleep(1000);
             driveStraight(DRIVE_SPEED, -12.0, 90.0);
             rb.boxServo.setPosition(0.8);
             sleep(1500);
+            liftByEncoder(2500);
+            rb.armServo1.setPosition(0.4);
+            rb.armServo2.setPosition(0.4);
+            sleep(1000);
+            liftByEncoder(0);
+            sleep(800);
+            strafeRightFixed(DRIVE_SPEED, -25.0, 90.0);
+
+        } else if (level == 2) {
+
+            driveStraight(DRIVE_SPEED, -21.5, 0.0);
+
+            driveStraight(DRIVE_SPEED, 19.0, 0);
+
+            turnToHeading(TURN_SPEED, 90.0);
+            driveStraight(DRIVE_SPEED, -50.0, 90.0);
+            strafeRightFixed(DRIVE_SPEED, -20.0, 90.0);
+            liftByEncoder(1700);
+            rb.armServo1.setPosition(0.8);
+            rb.armServo2.setPosition(0.8);
+            sleep(1000);
+            driveStraight(DRIVE_SPEED, -12.0, 90.0);
+            rb.boxServo.setPosition(0.8);
+            sleep(1500);
+            liftByEncoder(2500);
             rb.armServo1.setPosition(0.4);
             rb.armServo2.setPosition(0.4);
             sleep(1000);
@@ -259,49 +236,33 @@ public class NewBlueFarAuto extends LinearOpMode {
             strafeRightFixed(DRIVE_SPEED, -20.0, 90.0);
 
         } else {
-            driveStraight(DRIVE_SPEED, -21.0, 0.0);
-            rb.strafeRightByEncoder(-6, rb.frMotor, 0.6);
+            turnToHeading(TURN_SPEED, -12.5);
 
-            driveStraight(DRIVE_SPEED, 18.5, 0);
-            rb.strafeRightByEncoder(6, rb.frMotor, 0.6);
+            driveStraight(DRIVE_SPEED, -17.5, -12.5);
+
+            driveStraight(DRIVE_SPEED, 15.0, -12.5);
+
+            turnToHeading(TURN_SPEED, 0);
 
             turnToHeading(TURN_SPEED, 90.0);
-            driveStraight(DRIVE_SPEED / 2, -50.0, 90.0);
-//            turnToHeading( TURN_SPEED, 0.0);
-//            driveStraight(DRIVE_SPEED/2, -20.0, 0.0);
-//            turnToHeading( TURN_SPEED, 90.0);
-//            driveStraight(DRIVE_SPEED/2, -15.0, 90.0);
-//            liftByEncoder(-800, -0.5);
-//            rb.armServo1.setPosition(0.8);
-//            rb.armServo2.setPosition(0.8);
-//            sleep(4000);
-            rb.strafeRightByEncoder(-20, rb.frMotor, 0.6);
+            driveStraight(DRIVE_SPEED, -50.0, 90.0);
+            strafeRightFixed(DRIVE_SPEED, -25.0, 90.0);
+            liftByEncoder(1700);
+            rb.armServo1.setPosition(0.8);
+            rb.armServo2.setPosition(0.8);
             sleep(1000);
-            liftByEncoder(-800);
-            rb.armServo1.setPosition(0.8);
-            rb.armServo2.setPosition(0.8);
-            sleep(4000);
-            rb.driveForwardByEncoder(-9, rb.frMotor, -0.3);
+            driveStraight(DRIVE_SPEED, -12.0, 90.0);
             rb.boxServo.setPosition(0.8);
-            sleep(3500);
+            sleep(1500);
+            liftByEncoder(2500);
             rb.armServo1.setPosition(0.4);
             rb.armServo2.setPosition(0.4);
-            sleep(3000);
-            liftByEncoder(-800);
-            rb.armServo1.setPosition(0.8);
-            rb.armServo2.setPosition(0.8);
-            sleep(4000);
-            rb.driveForwardByEncoder(-4, rb.frMotor, -0.3);
-            rb.boxServo.setPosition(0.8);
-            sleep(3500);
-            rb.armServo1.setPosition(0.4);
-            rb.armServo2.setPosition(0.4);
-            sleep(3000);
+            sleep(1000);
             liftByEncoder(0);
             sleep(800);
-            rb.strafeRightByEncoder(-10, rb.frMotor, 0.6);
-
+            strafeRightFixed(DRIVE_SPEED, -15.0, 90.0);
         }
+
 
 
 //        driveStraight(DRIVE_SPEED, 17.0, -45.0);  // Drive Forward 17" at -45 degrees (12"x and 12"y)

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -36,7 +37,7 @@ public class MecanumTeleOp extends OpMode {
         boxOpen = true;
         BisPressed = false;
         boxRaised = false;
-
+        rb.liftmotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         telemetry.addData("Status", "Initialized");
     }
 
@@ -97,21 +98,39 @@ public class MecanumTeleOp extends OpMode {
                 rb.liftmotor.getCurrentPosition());
     }
 
+    public void goTo () {
+        if (gamepad2.left_stick_y > 0.5) {
+            rb.boxServo.setPosition(0.2);
+            boxOpen = true;
+            rb.liftmotor.setTargetPosition(rb.liftmotor.getCurrentPosition()+100);
+
+
+        }
+        if (gamepad2.left_stick_y < 0.5) {
+            rb.boxServo.setPosition(0.2);
+            boxOpen = true;
+            rb.liftmotor.setTargetPosition(rb.liftmotor.getCurrentPosition()-100);
+        }
+    }
+
     private void liftNoEncoder() {
         if (Math.abs(gamepad2.left_stick_y) > 0.5) {
             telemetry.addData("Starting at",
                     rb.liftmotor.getCurrentPosition());
-            telemetry.update();
             rb.boxServo.setPosition(0.2);
             boxOpen = true;
             rb.liftmotor.setPower(0.8 * gamepad2.left_stick_y);
+            telemetry.addData("Power:",
+                    rb.liftmotor.getPower());
+            telemetry.update();
 
         }
         else {
-            rb.liftmotor.setPower(0);
+            rb.liftmotor.setPower(-0.1);
         }
 
     }
+
 
 
     //moves the lift up
@@ -218,9 +237,9 @@ public class MecanumTeleOp extends OpMode {
 
 
     private void driveChassis() {
-        double y = -gamepad1.left_stick_y * 0.8;
-        double x = gamepad1.left_stick_x * 0.8;
-        double rx = gamepad1.right_stick_x * 0.65;
+        double y = -gamepad1.left_stick_y * 0.7;
+        double x = gamepad1.left_stick_x * 0.7;
+        double rx = gamepad1.right_stick_x * 0.55;
 
 
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);

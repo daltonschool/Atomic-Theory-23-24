@@ -20,7 +20,7 @@ public class PixelRecognizerNew extends OpenCvPipeline {
     int values;
 
     public int getPixelFieldPos(int[] init, int[] run) {
-        if (Math.sqrt(Math.pow((init[0] - run[0]), 2) + Math.pow((init[1] - run[1]), 2)) > 20) {
+        if (Math.sqrt(Math.pow((init[0] - run[0]), 2) + Math.pow((init[1] - run[1]), 2)) > 10) {
             if (init[0] > run[0]) {
                 shippingHubLevel = 1;
             }
@@ -43,8 +43,8 @@ public class PixelRecognizerNew extends OpenCvPipeline {
     }
 
     static final Rect BoundingBox = new Rect(
-            new Point(0, 0),
-            new Point(320, 90)
+            new Point(0, 20),
+            new Point(320, 110)
     );
 
     public int getPixelPosX() {
