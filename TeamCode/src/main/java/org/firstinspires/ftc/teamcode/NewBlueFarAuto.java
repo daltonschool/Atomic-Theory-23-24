@@ -17,7 +17,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 
-@Autonomous(name="NEW Blue Far auto", group="Robot")
+@Autonomous(name="NewBlueFarAuto", group="Robot")
 
 public class NewBlueFarAuto extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
@@ -67,9 +67,9 @@ public class NewBlueFarAuto extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        fl  = hardwareMap.get(DcMotor.class, "fl");
+        fl = hardwareMap.get(DcMotor.class, "fl");
         fr = hardwareMap.get(DcMotor.class, "fr");
-        bl  = hardwareMap.get(DcMotor.class, "bl");
+        bl = hardwareMap.get(DcMotor.class, "bl");
         br = hardwareMap.get(DcMotor.class, "br");
 
         fl.setDirection(DcMotor.Direction.REVERSE);
@@ -79,7 +79,7 @@ public class NewBlueFarAuto extends LinearOpMode {
 
         // The next 3 lines define Hub orientation.
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.LEFT;
-        RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
+        RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
 
         // Now initialize the IMU with this mounting orientation
@@ -95,10 +95,12 @@ public class NewBlueFarAuto extends LinearOpMode {
         fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
+        int[] pos = {0, 0};
+        int[] finalPos = {0, 0};
+        int cameraTicks = 0;
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam"), cameraMonitorViewId);
-        PixelRecognizer pipeline = new PixelRecognizer();
+        PixelRecognizerNew pipeline = new PixelRecognizerNew();
         webcam.setPipeline(pipeline);
         webcam.setMillisecondsPermissionTimeout(2500);
         webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
@@ -134,37 +136,21 @@ public class NewBlueFarAuto extends LinearOpMode {
 
             rb.liftmotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             rb.liftmotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            rb.liftmotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
             rb.frMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             rb.frMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             rb.frMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
             telemetry.addData("Status", "Initialized");
-
-            telemetry.update();
-
-
-//
-            int[] counts = {0, 0, 0};
-            for (int i = 0; i < 50; i++) {
-                if (pipeline.getShippingHubLevel() == 0) {
-                    i = 0;
-                    continue;
-                }
-                counts[pipeline.getShippingHubLevel() - 1]++;
+            if (cameraTicks < 120) {
+                pos[0] = pipeline.getPixelPosX();
+                pos[1] = pipeline.getPixelPosY();
+                cameraTicks++;
             }
-
-            if (counts[0] > counts[1] && counts[0] > counts[2]) {
-                level = 1; //left
-            } else if (counts[1] > counts[0] && counts[1] > counts[2]) {
-                level = 2; //middle
-            } else {
-                level = 3; //right
+            else {
+                telemetry.addData("Initial Position:", pos[0]);
+                telemetry.update();
             }
-            telemetry.addData("Team Element Location", level);
-            telemetry.update();
-            telemetry.addData("Team Element Location", level);
 
             // Set the encoders for closed loop speed control, and reset the heading.
             fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -172,31 +158,41 @@ public class NewBlueFarAuto extends LinearOpMode {
             bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             imu.resetYaw();
-
-            telemetry.update();
         }
+
+        waitForStart();
 
         runtime.reset();
 
-        level = 2;
-
-        if(level == 1){
-            driveStraight(DRIVE_SPEED, -15, 0.0);
-            sleep(250);
-            strafeRight(DRIVE_SPEED, 5, 0.0);
-            sleep(250);
-
-
-            driveStraight(DRIVE_SPEED, -2.5, 0);
-            sleep(5000);
-
+        cameraTicks = 0;
+        while (cameraTicks < 120) {
+            finalPos[0] = pipeline.getPixelPosX();
+            finalPos[1] = pipeline.getPixelPosY();
+            cameraTicks++;
+            telemetry.addData("Calibrating...", finalPos[0]);
+            telemetry.update();
+            sleep(10);
         }
-        else if(level == 2){
-            driveStraight(DRIVE_SPEED, -21.0, 0.0);
-            driveStraight(DRIVE_SPEED, 18.5, 0);
 
-            turnToHeading( TURN_SPEED, 90.0);
-            driveStraight(DRIVE_SPEED/2, -50.0, 90.0);
+        level = pipeline.getPixelFieldPos(pos, finalPos);
+        telemetry.addData("Final Position:", finalPos[0]);
+        telemetry.addData("Team Element Location", level);
+        telemetry.update();
+
+        liftByEncoder(-2000);
+
+
+
+
+        if (level == 1) {
+            driveStraight(DRIVE_SPEED, -21.0, 0.0);
+            rb.strafeRightByEncoder(6, rb.frMotor, 0.6);
+
+            driveStraight(DRIVE_SPEED, 18.5, 0);
+            rb.strafeRightByEncoder(-6, rb.frMotor, 0.6);
+
+            turnToHeading(TURN_SPEED, 90.0);
+            driveStraight(DRIVE_SPEED / 2, -50.0, 90.0);
 //            turnToHeading( TURN_SPEED, 0.0);
 //            driveStraight(DRIVE_SPEED/2, -20.0, 0.0);
 //            turnToHeading( TURN_SPEED, 90.0);
@@ -207,7 +203,7 @@ public class NewBlueFarAuto extends LinearOpMode {
 //            sleep(4000);
             rb.strafeRightByEncoder(-20, rb.frMotor, 0.6);
             sleep(1000);
-            liftByEncoder(-800, -0.5);
+            liftByEncoder(-800);
             rb.armServo1.setPosition(0.8);
             rb.armServo2.setPosition(0.8);
             sleep(4000);
@@ -217,20 +213,94 @@ public class NewBlueFarAuto extends LinearOpMode {
             rb.armServo1.setPosition(0.4);
             rb.armServo2.setPosition(0.4);
             sleep(3000);
-            liftByEncoder(0, 0.5);
+            liftByEncoder(-800);
+            rb.armServo1.setPosition(0.8);
+            rb.armServo2.setPosition(0.8);
+            sleep(4000);
+            rb.driveForwardByEncoder(-4, rb.frMotor, -0.3);
+            rb.boxServo.setPosition(0.8);
+            sleep(3500);
+            rb.armServo1.setPosition(0.4);
+            rb.armServo2.setPosition(0.4);
+            sleep(3000);
+            liftByEncoder(0);
             sleep(800);
+            rb.strafeRightByEncoder(-10, rb.frMotor, 0.6);
 
-        }
-        else{
-            driveStraight(DRIVE_SPEED, -15.0, 0.0);
-            sleep(200);
-            turnToHeading( TURN_SPEED, 75.0);
-            holdHeading( TURN_SPEED, 75.0, 0.5);
-            sleep(250);
+        } else if (level == 2) {
+
+            driveStraight(DRIVE_SPEED, -21.0, 0.0);
+
+            driveStraight(DRIVE_SPEED, 18.5, 0);
 
 
-            driveStraight(DRIVE_SPEED, -4.5, 0);
-            sleep(5000);
+            turnToHeading(TURN_SPEED, 90.0);
+            driveStraight(DRIVE_SPEED / 2, -50.0, 90.0);
+//            turnToHeading( TURN_SPEED, 0.0);
+//            driveStraight(DRIVE_SPEED/2, -20.0, 0.0);
+//            turnToHeading( TURN_SPEED, 90.0);
+//            driveStraight(DRIVE_SPEED/2, -15.0, 90.0);
+//            liftByEncoder(-800, -0.5);
+//            rb.armServo1.setPosition(0.8);
+//            rb.armServo2.setPosition(0.8);
+//            sleep(4000);
+            strafeRightFixed(DRIVE_SPEED, -20.0, 90.0);
+            liftByEncoder(-350);
+            rb.armServo1.setPosition(0.8);
+            rb.armServo2.setPosition(0.8);
+            sleep(1000);
+            driveStraight(DRIVE_SPEED, -12.0, 90.0);
+            rb.boxServo.setPosition(0.8);
+            sleep(1500);
+            rb.armServo1.setPosition(0.4);
+            rb.armServo2.setPosition(0.4);
+            sleep(1000);
+            liftByEncoder(0);
+            sleep(800);
+            strafeRightFixed(DRIVE_SPEED, -20.0, 90.0);
+
+        } else {
+            driveStraight(DRIVE_SPEED, -21.0, 0.0);
+            rb.strafeRightByEncoder(-6, rb.frMotor, 0.6);
+
+            driveStraight(DRIVE_SPEED, 18.5, 0);
+            rb.strafeRightByEncoder(6, rb.frMotor, 0.6);
+
+            turnToHeading(TURN_SPEED, 90.0);
+            driveStraight(DRIVE_SPEED / 2, -50.0, 90.0);
+//            turnToHeading( TURN_SPEED, 0.0);
+//            driveStraight(DRIVE_SPEED/2, -20.0, 0.0);
+//            turnToHeading( TURN_SPEED, 90.0);
+//            driveStraight(DRIVE_SPEED/2, -15.0, 90.0);
+//            liftByEncoder(-800, -0.5);
+//            rb.armServo1.setPosition(0.8);
+//            rb.armServo2.setPosition(0.8);
+//            sleep(4000);
+            rb.strafeRightByEncoder(-20, rb.frMotor, 0.6);
+            sleep(1000);
+            liftByEncoder(-800);
+            rb.armServo1.setPosition(0.8);
+            rb.armServo2.setPosition(0.8);
+            sleep(4000);
+            rb.driveForwardByEncoder(-9, rb.frMotor, -0.3);
+            rb.boxServo.setPosition(0.8);
+            sleep(3500);
+            rb.armServo1.setPosition(0.4);
+            rb.armServo2.setPosition(0.4);
+            sleep(3000);
+            liftByEncoder(-800);
+            rb.armServo1.setPosition(0.8);
+            rb.armServo2.setPosition(0.8);
+            sleep(4000);
+            rb.driveForwardByEncoder(-4, rb.frMotor, -0.3);
+            rb.boxServo.setPosition(0.8);
+            sleep(3500);
+            rb.armServo1.setPosition(0.4);
+            rb.armServo2.setPosition(0.4);
+            sleep(3000);
+            liftByEncoder(0);
+            sleep(800);
+            rb.strafeRightByEncoder(-10, rb.frMotor, 0.6);
 
         }
 
@@ -283,6 +353,61 @@ public class NewBlueFarAuto extends LinearOpMode {
             flTarget = fl.getCurrentPosition() + moveCounts;
             frTarget = fr.getCurrentPosition() + moveCounts;
             blTarget = bl.getCurrentPosition() + moveCounts;
+            brTarget = br.getCurrentPosition() + moveCounts;
+
+            // Set Target FIRST, then turn on RUN_TO_POSITION
+            fl.setTargetPosition(flTarget);
+            fr.setTargetPosition(frTarget);
+            bl.setTargetPosition(blTarget);
+            br.setTargetPosition(brTarget);
+
+
+            fl.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            fr.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            bl.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            br.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            // Set the required driving speed  (must be positive for RUN_TO_POSITION)
+            // Start driving straight, and then enter the control loop
+            maxDriveSpeed = Math.abs(maxDriveSpeed);
+            moveRobot(maxDriveSpeed, 0, 0);
+
+            // keep looping while we are still active, and BOTH motors are running.
+            while (opModeIsActive() &&
+                    (fl.isBusy() && fr.isBusy() && bl.isBusy() && br.isBusy())) {
+
+                // Determine required steering to keep on heading
+                turnSpeed = getSteeringCorrection(heading, P_DRIVE_GAIN);
+
+                // if driving in reverse, the motor correction also needs to be reversed
+                if (distance < 0)
+                    turnSpeed *= -1.0;
+
+                moveRobot(driveSpeed, turnSpeed, 0);
+
+                sendTelemetry(true);
+            }
+
+            moveRobot(0, 0, 0);
+            fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+    }
+
+    public void strafeRightFixed(double maxDriveSpeed,
+                                 double distance,
+                                 double heading) {
+
+        // Ensure that the OpMode is still active
+        if (opModeIsActive()) {
+
+            // Determine new target position, and pass to motor controller
+            int moveCounts = (int)(distance * COUNTS_PER_INCH);
+            flTarget = fl.getCurrentPosition() + moveCounts;
+            frTarget = fr.getCurrentPosition() - moveCounts;
+            blTarget = bl.getCurrentPosition() - moveCounts;
             brTarget = br.getCurrentPosition() + moveCounts;
 
             // Set Target FIRST, then turn on RUN_TO_POSITION
@@ -486,18 +611,10 @@ public class NewBlueFarAuto extends LinearOpMode {
         return orientation.getYaw(AngleUnit.DEGREES);
 
     }
-    void liftByEncoder(double encoder, double power) {
-        double currposition = rb.liftmotor.getCurrentPosition();
-        while (Math.abs(currposition - encoder) > 10){
-            rb.liftmotor.setPower(power);
+    void liftByEncoder(int encoder) {
+        rb.liftmotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rb.liftmotor.setTargetPosition(encoder);
 
-            currposition -= (currposition - encoder)/(Math.abs(currposition - encoder));
-
-            telemetry.addData("pos", currposition);
-            telemetry.update();
-
-        }
-        rb.driveStop();
+        rb.liftmotor.setPower(0.4);
     }
 }
-
