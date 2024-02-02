@@ -17,9 +17,9 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 
-@Autonomous(name="IMU Auto", group="Robot")
+@Autonomous(name="IMU Auto New", group="Robot")
 
-public class imuAutoTest extends LinearOpMode {
+public class imuAutoTestNew extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     OpenCvWebcam webcam;
     OpenCvWebcam frontWebcam;
@@ -67,9 +67,9 @@ public class imuAutoTest extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        fl  = hardwareMap.get(DcMotor.class, "fl");
+        fl = hardwareMap.get(DcMotor.class, "fl");
         fr = hardwareMap.get(DcMotor.class, "fr");
-        bl  = hardwareMap.get(DcMotor.class, "bl");
+        bl = hardwareMap.get(DcMotor.class, "bl");
         br = hardwareMap.get(DcMotor.class, "br");
 
         fl.setDirection(DcMotor.Direction.REVERSE);
@@ -79,7 +79,7 @@ public class imuAutoTest extends LinearOpMode {
 
         // The next 3 lines define Hub orientation.
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.LEFT;
-        RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
+        RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
 
         // Now initialize the IMU with this mounting orientation
@@ -98,7 +98,7 @@ public class imuAutoTest extends LinearOpMode {
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam"), cameraMonitorViewId);
-        PixelRecognizer pipeline = new PixelRecognizer();
+        PixelRecognizerNew pipeline = new PixelRecognizerNew();
         webcam.setPipeline(pipeline);
         webcam.setMillisecondsPermissionTimeout(2500);
         webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
@@ -119,6 +119,7 @@ public class imuAutoTest extends LinearOpMode {
             }
         });
         // Wait for the game to start (Display Gyro value while waiting)
+        int[] pos = {0, 0};
         while (opModeInInit()) {
             telemetry.addData(">", "Robot Heading = %4.0f", getHeading());
             telemetry.update();
@@ -146,25 +147,16 @@ public class imuAutoTest extends LinearOpMode {
 
 
 //
-            int[] counts = {0, 0, 0};
             for (int i = 0; i < 50; i++) {
-                if (pipeline.getShippingHubLevel() == 0) {
+                if (pipeline.getPixelPos() == null) {
                     i = 0;
                     continue;
                 }
-                counts[pipeline.getShippingHubLevel() - 1]++;
+                pos[0] += pipeline.getPixelPos()[0];
+                pos[1] += pipeline.getPixelPos()[1];
             }
-
-            if (counts[0] > counts[1] && counts[0] > counts[2]) {
-                level = 1; //left
-            } else if (counts[1] > counts[0] && counts[1] > counts[2]) {
-                level = 2; //middle
-            } else {
-                level = 3; //right
-            }
-            telemetry.addData("Team Element Location", level);
-            telemetry.update();
-            telemetry.addData("Team Element Location", level);
+            pos[0] = (int) (pos[0] / 50);
+            pos[1] = (int) (pos[1] / 50);
 
             // Set the encoders for closed loop speed control, and reset the heading.
             fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -172,15 +164,32 @@ public class imuAutoTest extends LinearOpMode {
             bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             imu.resetYaw();
-
-            telemetry.update();
         }
 
         runtime.reset();
 
-        level = 2;
+        int[] finalPos = {0, 0};
+        for (int i = 0; i < 50; i++) {
+            if (pipeline.getPixelPos() == null) {
+                i = 0;
+                continue;
+            }
+            finalPos[0] += pipeline.getPixelPos()[0];
+            finalPos[1] += pipeline.getPixelPos()[1];
+        }
+        finalPos[0] = (int) (finalPos[0] / 50);
+        finalPos[1] = (int) (finalPos[1] / 50);
 
-        if(level == 1){
+        level = pipeline.getPixelFieldPos(pos, finalPos);
+
+        telemetry.addData("Team Element Location", level);
+        telemetry.update();
+        telemetry.addData("Team Element Location", level);
+
+        telemetry.update();
+
+
+        if (level == 1) {
             driveStraight(DRIVE_SPEED, -15, 0.0);
             sleep(250);
             strafeRight(DRIVE_SPEED, 5, 0.0);
@@ -190,15 +199,14 @@ public class imuAutoTest extends LinearOpMode {
             driveStraight(DRIVE_SPEED, -2.5, 0);
             sleep(5000);
 
-        }
-        else if(level == 2){
+        } else if (level == 2) {
             driveStraight(DRIVE_SPEED, -21.0, 0.0);
 
             driveStraight(DRIVE_SPEED, 18.5, 0);
 
 
-            turnToHeading( TURN_SPEED, 90.0);
-            driveStraight(DRIVE_SPEED/2, -50.0, 90.0);
+            turnToHeading(TURN_SPEED, 90.0);
+            driveStraight(DRIVE_SPEED / 2, -50.0, 90.0);
 //            turnToHeading( TURN_SPEED, 0.0);
 //            driveStraight(DRIVE_SPEED/2, -20.0, 0.0);
 //            turnToHeading( TURN_SPEED, 90.0);
@@ -222,12 +230,11 @@ public class imuAutoTest extends LinearOpMode {
             liftByEncoder(0, 0.5);
             sleep(800);
 
-        }
-        else{
+        } else {
             driveStraight(DRIVE_SPEED, -15.0, 0.0);
             sleep(200);
-            turnToHeading( TURN_SPEED, 75.0);
-            holdHeading( TURN_SPEED, 75.0, 0.5);
+            turnToHeading(TURN_SPEED, 75.0);
+            holdHeading(TURN_SPEED, 75.0, 0.5);
             sleep(250);
 
 
