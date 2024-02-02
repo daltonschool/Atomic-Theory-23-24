@@ -161,6 +161,8 @@ public class AT_blueFar extends LinearOpMode {
             imu.resetYaw();
         }
 
+        waitForStart();
+
         runtime.reset();
 
         cameraTicks = 0;
@@ -240,23 +242,23 @@ public class AT_blueFar extends LinearOpMode {
 //            rb.armServo1.setPosition(0.8);
 //            rb.armServo2.setPosition(0.8);
 //            sleep(4000);
-            rb.strafeRightByEncoder(-20, rb.frMotor, 0.6);
+            strafeRightFixed(DRIVE_SPEED/2, -22.0, 90.0);
             sleep(1000);
-            liftByEncoder(-800, -0.5);
+            liftByEncoder(-300, -0.5);
             rb.armServo1.setPosition(0.8);
             rb.armServo2.setPosition(0.8);
             sleep(4000);
-            rb.driveForwardByEncoder(-9, rb.frMotor, -0.3);
+            driveStraight(DRIVE_SPEED / 2, -10.0, 90.0);
             rb.boxServo.setPosition(0.8);
             sleep(3500);
             rb.armServo1.setPosition(0.4);
             rb.armServo2.setPosition(0.4);
             sleep(3000);
-            liftByEncoder(-800, -0.5);
+            liftByEncoder(-500, -0.5);
             rb.armServo1.setPosition(0.8);
             rb.armServo2.setPosition(0.8);
             sleep(4000);
-            rb.driveForwardByEncoder(-4, rb.frMotor, -0.3);
+            driveStraight(DRIVE_SPEED / 2, -4.0, 90.0);
             rb.boxServo.setPosition(0.8);
             sleep(3500);
             rb.armServo1.setPosition(0.4);
@@ -264,7 +266,7 @@ public class AT_blueFar extends LinearOpMode {
             sleep(3000);
             liftByEncoder(0, 0.5);
             sleep(800);
-            rb.strafeRightByEncoder(-10, rb.frMotor, 0.6);
+            strafeRightFixed(DRIVE_SPEED/2, -10.0, 90.0);
 
         } else {
             driveStraight(DRIVE_SPEED, -21.0, 0.0);
@@ -360,6 +362,61 @@ public class AT_blueFar extends LinearOpMode {
             flTarget = fl.getCurrentPosition() + moveCounts;
             frTarget = fr.getCurrentPosition() + moveCounts;
             blTarget = bl.getCurrentPosition() + moveCounts;
+            brTarget = br.getCurrentPosition() + moveCounts;
+
+            // Set Target FIRST, then turn on RUN_TO_POSITION
+            fl.setTargetPosition(flTarget);
+            fr.setTargetPosition(frTarget);
+            bl.setTargetPosition(blTarget);
+            br.setTargetPosition(brTarget);
+
+
+            fl.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            fr.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            bl.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            br.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            // Set the required driving speed  (must be positive for RUN_TO_POSITION)
+            // Start driving straight, and then enter the control loop
+            maxDriveSpeed = Math.abs(maxDriveSpeed);
+            moveRobot(maxDriveSpeed, 0, 0);
+
+            // keep looping while we are still active, and BOTH motors are running.
+            while (opModeIsActive() &&
+                    (fl.isBusy() && fr.isBusy() && bl.isBusy() && br.isBusy())) {
+
+                // Determine required steering to keep on heading
+                turnSpeed = getSteeringCorrection(heading, P_DRIVE_GAIN);
+
+                // if driving in reverse, the motor correction also needs to be reversed
+                if (distance < 0)
+                    turnSpeed *= -1.0;
+
+                moveRobot(driveSpeed, turnSpeed, 0);
+
+                sendTelemetry(true);
+            }
+
+            moveRobot(0, 0, 0);
+            fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+    }
+
+    public void strafeRightFixed(double maxDriveSpeed,
+                              double distance,
+                              double heading) {
+
+        // Ensure that the OpMode is still active
+        if (opModeIsActive()) {
+
+            // Determine new target position, and pass to motor controller
+            int moveCounts = (int)(distance * COUNTS_PER_INCH);
+            flTarget = fl.getCurrentPosition() + moveCounts;
+            frTarget = fr.getCurrentPosition() - moveCounts;
+            blTarget = bl.getCurrentPosition() - moveCounts;
             brTarget = br.getCurrentPosition() + moveCounts;
 
             // Set Target FIRST, then turn on RUN_TO_POSITION
