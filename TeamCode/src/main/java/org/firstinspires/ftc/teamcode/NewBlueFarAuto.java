@@ -17,9 +17,9 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 
-@Autonomous(name="IMU Auto", group="Robot")
+@Autonomous(name="NEW Blue Far auto", group="Robot")
 
-public class imuAutoTest extends LinearOpMode {
+public class NewBlueFarAuto extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     OpenCvWebcam webcam;
     OpenCvWebcam frontWebcam;
@@ -193,9 +193,7 @@ public class imuAutoTest extends LinearOpMode {
         }
         else if(level == 2){
             driveStraight(DRIVE_SPEED, -21.0, 0.0);
-
             driveStraight(DRIVE_SPEED, 18.5, 0);
-
 
             turnToHeading( TURN_SPEED, 90.0);
             driveStraight(DRIVE_SPEED/2, -50.0, 90.0);

@@ -101,6 +101,7 @@ public class MecanumTeleOp extends OpMode {
         if (Math.abs(gamepad2.left_stick_y) > 0.5) {
             telemetry.addData("Starting at",
                     rb.liftmotor.getCurrentPosition());
+            telemetry.update();
             rb.boxServo.setPosition(0.2);
             boxOpen = true;
             rb.liftmotor.setPower(0.8 * gamepad2.left_stick_y);
