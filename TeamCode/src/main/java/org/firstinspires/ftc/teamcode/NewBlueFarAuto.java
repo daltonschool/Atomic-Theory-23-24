@@ -143,15 +143,6 @@ public class NewBlueFarAuto extends LinearOpMode {
             rb.frMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             rb.frMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             rb.frMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            rb.flMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            rb.flMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            rb.flMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            rb.brMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            rb.brMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            rb.brMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            rb.blMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            rb.blMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            rb.blMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
             telemetry.addData("Status", "Initialized");
             if (cameraTicks < 120) {
