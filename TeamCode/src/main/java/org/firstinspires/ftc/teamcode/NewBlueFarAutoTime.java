@@ -4,6 +4,7 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -75,7 +76,7 @@ public class NewBlueFarAuto extends LinearOpMode {
 
         fl.setDirection(DcMotor.Direction.REVERSE);
         fr.setDirection(DcMotor.Direction.FORWARD);
-        bl.setDirection(DcMotor.Direction.REVERSE);
+        bl.setDirection(DcMotor.Direction.FORWARD);
         br.setDirection(DcMotor.Direction.FORWARD);
 
         // The next 3 lines define Hub orientation.
@@ -88,14 +89,6 @@ public class NewBlueFarAuto extends LinearOpMode {
         imu = hardwareMap.get(IMU.class, "imu");
         imu.initialize(new IMU.Parameters(orientationOnRobot));
 
-        fl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        fr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        bl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        br.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         int[] pos = {0, 0};
         int[] finalPos = {0, 0};
         int cameraTicks = 0;
@@ -137,22 +130,6 @@ public class NewBlueFarAuto extends LinearOpMode {
             rb.brMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             rb.liftmotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-            rb.liftmotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            rb.liftmotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-            rb.frMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            rb.frMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            rb.frMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            rb.flMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            rb.flMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            rb.flMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            rb.brMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            rb.brMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            rb.brMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            rb.blMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            rb.blMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            rb.blMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
             telemetry.addData("Status", "Initialized");
             if (cameraTicks < 120) {
                 pos[0] = pipeline.getPixelPosX();
@@ -172,10 +149,6 @@ public class NewBlueFarAuto extends LinearOpMode {
             telemetry.update();
 
             // Set the encoders for closed loop speed control, and reset the heading.
-            fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             imu.resetYaw();
         }
 
@@ -391,26 +364,6 @@ public class NewBlueFarAuto extends LinearOpMode {
             moveRobot(maxDriveSpeed, 0, 0);
 
             // keep looping while we are still active, and BOTH motors are running.
-            while (opModeIsActive() &&
-                    (fl.isBusy() && fr.isBusy() && bl.isBusy() && br.isBusy())) {
-
-                // Determine required steering to keep on heading
-                turnSpeed = getSteeringCorrection(heading, P_DRIVE_GAIN);
-
-                // if driving in reverse, the motor correction also needs to be reversed
-                if (distance < 0)
-                    turnSpeed *= -1.0;
-
-                moveRobot(driveSpeed, turnSpeed, 0);
-
-                sendTelemetry(true);
-            }
-
-            moveRobot(0, 0, 0);
-            fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
     }
 
@@ -446,26 +399,6 @@ public class NewBlueFarAuto extends LinearOpMode {
             moveRobot(maxDriveSpeed, 0, 0);
 
             // keep looping while we are still active, and BOTH motors are running.
-            while (opModeIsActive() &&
-                    (fl.isBusy() && fr.isBusy() && bl.isBusy() && br.isBusy())) {
-
-                // Determine required steering to keep on heading
-                turnSpeed = getSteeringCorrection(heading, P_DRIVE_GAIN);
-
-                // if driving in reverse, the motor correction also needs to be reversed
-                if (distance < 0)
-                    turnSpeed *= -1.0;
-
-                moveRobot(driveSpeed, turnSpeed, 0);
-
-                sendTelemetry(true);
-            }
-
-            moveRobot(0, 0, 0);
-            fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
     }
 
@@ -508,66 +441,36 @@ public class NewBlueFarAuto extends LinearOpMode {
 
 
             moveRobot(0, 0, 0);
-            fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            fl.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            fr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            bl.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            br.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
     }
 
 
-    public void turnToHeading(double maxTurnSpeed, double heading) {
+    public void turnToHeading(double maxDrivingSpeed, double heading) {
 
 
-        getSteeringCorrection(heading, P_DRIVE_GAIN);
 
-        // keep looping while we are still active, and not on heading.
-        while (opModeIsActive() && (Math.abs(headingError) > HEADING_THRESHOLD)) {
+        while (opModeIsActive() && (Math.abs(heading - ) > HEADING_THRESHOLD)) {
 
-            // Determine required steering to keep on heading
-            turnSpeed = getSteeringCorrection(heading, P_TURN_GAIN);
-
-            // Clip the speed to the maximum permitted value.
-            turnSpeed = Range.clip(turnSpeed, -maxTurnSpeed, maxTurnSpeed);
-
-            // Pivot in place by applying the turning correction
-            moveRobot(0, turnSpeed, 0);
-
-            // Display drive status for the driver.
-            sendTelemetry(false);
         }
-
-        // Stop all motion;
-        moveRobot(0, 0, 0);
     }
 
-    public void holdHeading(double maxTurnSpeed, double heading, double holdTime) {
-
-        ElapsedTime holdTimer = new ElapsedTime();
-        holdTimer.reset();
-
-        while (opModeIsActive() && (holdTimer.time() < holdTime)) {
-            turnSpeed = getSteeringCorrection(heading, P_TURN_GAIN);
-            turnSpeed = Range.clip(turnSpeed, -maxTurnSpeed, maxTurnSpeed);
-            moveRobot(0, turnSpeed, 0);
-            sendTelemetry(false);
-        }
-        moveRobot(0, 0, 0);
-    }
-
-    public double getSteeringCorrection(double desiredHeading, double proportionalGain) {
-        targetHeading = desiredHeading;  // Save for telemetry
-
-        // Determine the heading current error
-        headingError = targetHeading - getHeading();
-
-        // Normalize the error to be within +/- 180 degrees
-        while (headingError > 180)  headingError -= 360;
-        while (headingError <= -180) headingError += 360;
-
-        // Multiply the error by the gain to determine the required steering correction/  Limit the result to +/- 1.0
-        return Range.clip(headingError * proportionalGain, -1, 1);
-    }
+//    public double getSteeringCorrection(double desiredHeading, double proportionalGain) {
+//        targetHeading = desiredHeading;  // Save for telemetry
+//
+//        // Determine the heading current error
+//        headingError = targetHeading - getHeading();
+//
+//        // Normalize the error to be within +/- 180 degrees
+//        while (headingError > 180)  headingError -= 360;
+//        while (headingError <= -180) headingError += 360;
+//
+//        // Multiply the error by the gain to determine the required steering correction/  Limit the result to +/- 1.0
+//        return Range.clip(headingError * proportionalGain, -1, 1);
+//    }
 
     /**
      * Take separate drive (fwd/rev) and turn (right/left) requests,
