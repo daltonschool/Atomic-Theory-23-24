@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -121,8 +120,6 @@ public class NewBlueFarAuto extends LinearOpMode {
                 // This will be called if the camera could not be opened
             }
         });
-        YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
-        AngularVelocity angularVelocity = imu.getRobotAngularVelocity(AngleUnit.DEGREES);
         // Wait for the game to start (Display Gyro value while waiting)
         while (opModeInInit()) {
             telemetry.addData(">", "Robot Heading = %4.0f", getHeading());
@@ -163,13 +160,6 @@ public class NewBlueFarAuto extends LinearOpMode {
                 telemetry.addData("Initial Position:", pos[0]);
                 telemetry.update();
             }
-            telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
-            telemetry.addData("Pitch (X)", "%.2f Deg.", orientation.getPitch(AngleUnit.DEGREES));
-            telemetry.addData("Roll (Y)", "%.2f Deg.\n", orientation.getRoll(AngleUnit.DEGREES));
-            telemetry.addData("Yaw (Z) velocity", "%.2f Deg/Sec", angularVelocity.zRotationRate);
-            telemetry.addData("Pitch (X) velocity", "%.2f Deg/Sec", angularVelocity.xRotationRate);
-            telemetry.addData("Roll (Y) velocity", "%.2f Deg/Sec", angularVelocity.yRotationRate);
-            telemetry.update();
 
             // Set the encoders for closed loop speed control, and reset the heading.
             fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -202,22 +192,9 @@ public class NewBlueFarAuto extends LinearOpMode {
 
         if (level == 1) {
             driveStraight(DRIVE_SPEED, -20.5, 0.0);
-            telemetry.addData("FR", fr.getCurrentPosition());
-            telemetry.addData("FL", fl.getCurrentPosition());
-            telemetry.addData("BR", br.getCurrentPosition());
-            telemetry.addData("Bl", bl.getCurrentPosition());
-            telemetry.update();
-            sleep(1000);
 
             turnToHeading(TURN_SPEED, 90.0);
             driveStraight(DRIVE_SPEED, -5.0, 90.0);
-
-            telemetry.addData("FR", fr.getCurrentPosition());
-            telemetry.addData("FL", fl.getCurrentPosition());
-            telemetry.addData("BR", br.getCurrentPosition());
-            telemetry.addData("Bl", bl.getCurrentPosition());
-            telemetry.update();
-            sleep(1000);
 
             driveStraight(DRIVE_SPEED, 5.0, 90.0);
 
@@ -246,20 +223,8 @@ public class NewBlueFarAuto extends LinearOpMode {
         } else if (level == 2) {
 
             driveStraight(DRIVE_SPEED, -21.5, 0.0);
-            telemetry.addData("FR", fr.getCurrentPosition());
-            telemetry.addData("FL", fl.getCurrentPosition());
-            telemetry.addData("BR", br.getCurrentPosition());
-            telemetry.addData("Bl", bl.getCurrentPosition());
-            telemetry.update();
-            sleep(1000);
 
             driveStraight(DRIVE_SPEED, 19.0, 0);
-            telemetry.addData("FR", fr.getCurrentPosition());
-            telemetry.addData("FL", fl.getCurrentPosition());
-            telemetry.addData("BR", br.getCurrentPosition());
-            telemetry.addData("Bl", bl.getCurrentPosition());
-            telemetry.update();
-            sleep(1000);
 
             turnToHeading(TURN_SPEED, 90.0);
             driveStraight(DRIVE_SPEED, -50.0, 90.0);
@@ -282,21 +247,7 @@ public class NewBlueFarAuto extends LinearOpMode {
         } else {
             turnToHeading(TURN_SPEED, -12.5);
 
-            telemetry.addData("FR", fr.getCurrentPosition());
-            telemetry.addData("FL", fl.getCurrentPosition());
-            telemetry.addData("BR", br.getCurrentPosition());
-            telemetry.addData("Bl", bl.getCurrentPosition());
-            telemetry.update();
-            sleep(1000);
-
             driveStraight(DRIVE_SPEED, -17.5, -12.5);
-
-            telemetry.addData("FR", fr.getCurrentPosition());
-            telemetry.addData("FL", fl.getCurrentPosition());
-            telemetry.addData("BR", br.getCurrentPosition());
-            telemetry.addData("Bl", bl.getCurrentPosition());
-            telemetry.update();
-            sleep(1000);
 
             driveStraight(DRIVE_SPEED, 15.0, -12.5);
 
