@@ -261,10 +261,8 @@ public class MecanumTeleOp extends OpMode {
             rb.brMotor.setPower(backRightPower);
         }
 
-        telemetry.addData("",rb.flMotor.getCurrentPosition());
-        telemetry.addData("",rb.blMotor.getCurrentPosition());
-        telemetry.addData("",rb.frMotor.getCurrentPosition());
-        telemetry.addData("",rb.brMotor.getCurrentPosition());
+        telemetry.addData("Drive:",rb.frMotor.getCurrentPosition());
+        telemetry.addData("Strafe:",rb.flMotor.getCurrentPosition());
     }
 }
 
